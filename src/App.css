@@ -1,0 +1,127 @@
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  min-width: 360px;
+  max-width: 960px;
+  height: 95vh;
+  min-height: 500px;
+  border: 1px solid grey;
+  border-radius: 6px;
+}
+
+.display-box {
+  display: flex;
+  flex-direction: column;
+  width: 98%;
+  margin: 1%;
+  height: 15%;
+  border: 1px solid grey;
+  border-radius: 5px;
+  overflow: scroll;
+}
+
+.display-box h1 {
+  font-size: .8em;
+  font-family: "Courier";
+  font-weight: bold;
+  margin: 2px;
+}
+
+.display-box p {
+  font-size: .9em;
+  font-family: "Courier";
+  margin: 2px;
+}
+
+.settings-box,
+.chord-options-box,
+.chord-matrix-box {
+  display: flex;
+  flex-direction: row;
+  flex-flow: wrap;
+  width: 98%;
+  margin: 1%;
+}
+
+.mem-scale-box {
+  display: flex;
+  flex-flow: wrap;
+  flex-direction: column;
+  width: 98%;
+  margin: 1%;
+}
+
+.settings-box {
+  height: 10%;
+}
+
+.mem-scale-box {
+  height: 30%;
+}
+
+.chord-options-box {
+  height: 5%;
+}
+
+.chord-matrix-box {
+  height: 40%;
+}
+
+.settings-button {
+  width: 12%;
+  height: 50%;
+}
+
+.settings-button:active {
+  background-color: yellow;
+}
+
+.chord-mem-button,
+.scale-button {
+  width: 12%;
+  height: 30%;
+}
+
+.chord-mem-button:active {
+  background-color: green;
+}
+
+
+.scale-button:active {
+  background-color: yellow;
+}
+
+
+.chord-options-button {
+  width: 12%;
+  height: 100%;
+}
+
+.chord-options-button:active {
+  background-color: yellow;
+}
+
+.chord-matrix-button {
+  width: 12%;
+  height: 23%;
+}
+
+.chord-matrix-button:active {
+  background-color: green;
+}
+
+.button {
+  background-color: #e3e3e3;
+  margin: .25%;
+  border-radius: 3px;
+}
