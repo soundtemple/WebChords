@@ -44,8 +44,7 @@ body {
 }
 
 .settings-box,
-.chord-options-box,
-.chord-matrix-box {
+.chord-options-box {
   display: flex;
   flex-direction: row;
   flex-flow: wrap;
@@ -53,10 +52,11 @@ body {
   margin: 1%;
 }
 
-.mem-scale-box {
+.mem-scale-box,
+.chord-matrix-box  {
   display: flex;
   flex-flow: wrap;
-  flex-direction: column;
+  flex-direction: column-reverse;
   width: 98%;
   margin: 1%;
 }
@@ -98,7 +98,7 @@ body {
 
 
 .scale-button:active {
-  background-color: yellow;
+  background-color: blue;
 }
 
 
