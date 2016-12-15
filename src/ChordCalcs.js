@@ -44,16 +44,16 @@ const allModes = {
 
 var scale = "major",
     midiNotesList = {},
-    scaleMidiNumbers = [0,2,4,5,7,9,11,12],
+    scalePattern = [0,2,4,5,7,9,11,12],
     chordScaleDegs = [],
     chordMidiNums = [],
     rootNote = 60,
+    scaleNoteLetters = [],
+    scaleSynthData = [],
     chordFreqs = [],
     chordNoteLetters = [],
     noteInfo = {},
-    suspension = 0,
-    tetrad = false,
-    tetradAdj = 6; //6 for 7th or 8 for add9
+    octToggle = 0
 
 
 function createNotes() {
@@ -88,12 +88,31 @@ function setKey(newKey) {
   return rootNote
 }
 
+function getScaleNotes(selectedMode) {
+  scaleNoteLetters = []; //reset array
+  selectedMode.pattern.forEach(function (elem, index){
+    scaleNoteLetters[index] = midiNotesList[elem + rootNote][0];
+  })
+  console.log('scale note letters are...'+scaleNoteLetters);
+  return scaleNoteLetters
+};
+
+function getScaleSynthData(selectedMode) {
+  var orderScalePads = [0,3,6,1,4,7,2,5,9,12,15,10,13,16,11,14]
+  scaleSynthData = []; // reset array
+  scaleSynthData[8] = "PENT";
+  scaleSynthData[17] = "OCT+/-";
+  selectedMode.pattern.forEach(function (elem, index){
+    scaleSynthData[orderScalePads[index]] = midiNotesList[elem + rootNote + octToggle][0];
+    scaleSynthData[orderScalePads[index] + 9] = midiNotesList[elem + rootNote + oneOctave + octToggle][0];
+  })
+  console.log('scaleSynthData...'+scaleSynthData);
+  return scaleSynthData
+};
+
 function setScale(selectedScale) {
-  console.log(selectedScale);
   var selectedMode = allModes[selectedScale];
-  console.log(selectedMode);
-  scaleMidiNumbers = selectedMode.pattern;
-  console.log(scaleMidiNumbers);
+  scalePattern = selectedMode.pattern;
   return selectedMode
 }
 
@@ -115,13 +134,23 @@ function getChordOctaveAdj(chordRoot, chordRow) {
   return octaveAdjTable['triads'][rowNum][chordRoot];
 };
 
-function getChordScaleDegs(chordRoot, inversionRow) {
+function getChordScaleDegs(chordRoot, inversionRow, chordVariations, chordEmb) {
+  var suspension = 0;
+  chordScaleDegs = [];
+  if (chordVariations == 1) {
+      suspension = -1;
+  } else if (chordVariations == 2) {
+    suspension = 1;
+  }
   chordRoot+= 1;
   chordScaleDegs[0] = chordRoot;
   chordScaleDegs[1] = chordRoot + 2 + suspension;
   chordScaleDegs[2] = chordRoot + 4;
-  if (tetrad) {
-    chordScaleDegs[3] = chordRoot + tetradAdj;
+  console.log(chordEmb + '=chord emb');
+  if (chordEmb == 1) {
+    chordScaleDegs[3] = chordRoot + 6; //6 scale degrees to add 7th;
+  } else if (chordEmb == 2) {
+    chordScaleDegs[3] = chordRoot + 8; //8 scale degrees to add 9th;
   };
   chordScaleDegs.forEach(function(item, index) {
     if (item > 7) {
@@ -129,7 +158,6 @@ function getChordScaleDegs(chordRoot, inversionRow) {
       chordScaleDegs[index] = item;
     }
   });
-  console.log(chordScaleDegs);
   return chordScaleDegs;
 };
 
@@ -137,7 +165,7 @@ function getChordMidiNums(chordScaleDegs, chordInversion, chordOctAdj) {
   chordMidiNums = []; // reset array
   chordOctAdj = chordOctAdj * oneOctave;
   chordScaleDegs.forEach(function(item, index){
-    chordMidiNums[index] = scaleMidiNumbers[ chordScaleDegs[index] - 1 ];
+    chordMidiNums[index] = scalePattern[ chordScaleDegs[index] - 1 ];
     chordMidiNums[index] += chordOctAdj + rootNote;
   });
   // adjust for inversion
@@ -189,12 +217,18 @@ function getChordName(chordMidiNums) {
   console.log("ChordName");
 };
 
+function scalePlay(padID) {
+  
+};
+
 
 module.exports = {
   createNotes: createNotes,
   getAllModes: getAllModes,
   setKey: setKey,
   setScale: setScale,
+  getScaleNotes: getScaleNotes,
+  getScaleSynthData: getScaleSynthData,
   chordRootDegree: chordRootDegree,
   chordRow: chordRow,
   getChordInversion: getChordInversion,

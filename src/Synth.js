@@ -1,3 +1,4 @@
+
 var rootNote = 60,
     oscType = 'sawtooth',
     freqCutoff = 10000,
@@ -46,7 +47,7 @@ function chordPlayOn(chordFreqNotes, tetrad) {
   osc2.type = oscType;
   osc3.type = oscType;
 
-  if (tetrad) {
+  if (tetrad > 0) {
     var osc4 = context.createOscillator();
     oscillators.push(osc4)
     osc4.type = oscType;

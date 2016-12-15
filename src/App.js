@@ -13,9 +13,16 @@ var App = React.createClass({
 
     return {
       allNotes: ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],
+      chordVarLabels: ['ROOT', 'SUS2', 'SUS4', ''],
+      chordEmbLabels: ['TRIAD', '7TH', 'ADD9',''],
       allModes: cc.getAllModes(),
       root: 60,
       scale: "major",
+      chordVariations: 0,
+      chordEmb: 0,
+      selectedMode: cc.setScale("major"),
+      scaleNotes: [],
+      scaleSynthData: [],
       chordRoot: null,
       chordRow: null,
       chordInversion: null,
@@ -32,11 +39,48 @@ var App = React.createClass({
   setKey: function(event) {
     this.setState({root: event.target.value});
     cc.setKey(event.target.value);
+    var scaleNotes = cc.getScaleNotes(this.state.selectedMode);
+    var scaleSynthData = cc.getScaleSynthData(this.state.selectedMode)
+    this.setState({
+      scaleNotes: scaleNotes,
+      scaleSynthData: scaleSynthData
+    })
   },
 
   setScale: function(event) {
-    this.setState({scale: event.target.value});
-    cc.setScale(event.target.value);
+    var selectedMode = cc.setScale(event.target.value);
+    var scaleNotes = cc.getScaleNotes(selectedMode);
+    var scaleSynthData = cc.getScaleSynthData(selectedMode)
+    this.setState({
+      scale: event.target.value,
+      selectedMode: selectedMode,
+      scaleNotes: scaleNotes,
+      scaleSynthData: scaleSynthData
+    });
+  },
+
+  setChordVar: function(pad) {
+    var chordVariations = pad;
+    this.setState({
+      chordVariations: chordVariations,
+    })
+  },
+
+  setChordEmb: function(pad) {
+    var chordEmb = pad;
+    this.setState({
+      chordEmb: chordEmb,
+    })
+  },
+
+  scalePlay: function(padID) {
+    if (padID == 8) {
+      console.log('Toggle Pentatonic');
+    } else if (padID == 17) {
+      console.log('Toggle octave adj');
+    } else {
+      console.log('play note need note name');
+    }
   },
 
   padOn: function(btnNum) {
@@ -45,7 +89,7 @@ var App = React.createClass({
     var chordRow = cc.chordRow(btnNum, chordRoot);
     var chordInversion = cc.getChordInversion(chordRoot, chordRow);
     var chordOctAdj = cc.getChordOctaveAdj(chordRoot, chordRow);
-    var chordScaleDegs = cc.getChordScaleDegs(chordRoot, chordRow);
+    var chordScaleDegs = cc.getChordScaleDegs(chordRoot, chordRow, this.state.chordVariations, this.state.chordEmb);
     var chordMidiNums = cc.getChordMidiNums(chordScaleDegs, chordInversion, chordOctAdj);
     var chordNoteLetters = cc.getChordNoteLetters(chordMidiNums);
     var chordFreqs = cc.getChordFreqs(chordMidiNums);
@@ -59,7 +103,7 @@ var App = React.createClass({
       chordFreqInt: chordFreqInt,
       chordName: chordName
     });
-    webSynth.chordPlayOn(chordFreqs, cc.tetrad);
+    webSynth.chordPlayOn(chordFreqs, this.state.chordEmb);
   },
 
   padOff: function(btnNum) {
@@ -90,7 +134,6 @@ var App = React.createClass({
             <div><p>ROOT:</p></div>
             <div><p>NAME:</p></div>
             <div><p>NOTES:</p></div>
-            <div><p>PLAYED:</p></div>
           </div>
           <div className="scale-info-data">
             <div>
@@ -111,10 +154,16 @@ var App = React.createClass({
                 }, this)}
               </select>
             </div>
-            <div><p>C D E F G A B</p></div>
-            <div><p>C3</p></div>
+            <div><p>{this.state.scaleNotes.join(' ')}</p></div>
           </div>
+          <div className="settings-labels">
+            <div><p>MIDI IN:</p></div>
+            <div><p>MIDI OUT:</p></div>
 
+          </div>
+          <div className="settings-data">
+
+          </div>
 
         </div>
 
@@ -129,24 +178,40 @@ var App = React.createClass({
         </div>
 
         <div className="mem-scale-box">
+          {/* chord mem buttons*/}
           {_.range(6).map(function(elem, index) {
             return (
-              <div className="button chord-mem-button" key={elem} id={"mem" + elem} onClick={() => {this.trigger("mem", {elem})}}>
+              <div className="button chord-mem-button" key={elem} id={"mem" + elem} onClick={() => {this.trigger("mem", {elem})}}>MEM{index + 1}
               </div>
             );
           }, this)}
+          {/* scale play buttons*/}
           {_.range(18).map(function(elem, index) {
             return (
-              <div className="button scale-button" key={elem} id={"scale" + elem} onClick={() => {this.trigger("scale", {elem})}}>
+              <div className="button scale-button" key={elem} id={"scale" + elem} onClick={() => {this.scalePlay(elem)}}>{this.state.scaleSynthData[index]}
               </div>
             );
           }, this)}
         </div>
 
         <div className="chord-options-box">
-          {_.range(8).map(function(elem, index) {
+          {_.range(4).map(function(elem, index) {
+            var classNameList = "button chord-options-button"
+            if (this.state.chordVariations == elem) {
+              classNameList += " selected";
+            }
             return (
-              <div className="button chord-options-button" key={elem} id={"option" + elem} onClick={() => {this.trigger("opt", {elem})}}>
+              <div className={classNameList} key={elem} id={"var" + elem} onClick={() => {this.setChordVar(elem)}}>{this.state.chordVarLabels[index]}
+              </div>
+            );
+          }, this)}
+          {_.range(4).map(function(elem, index) {
+            var classNameList = "button chord-options-button"
+            if (this.state.chordEmb == elem) {
+              classNameList += " selected";
+            }
+            return (
+              <div className={classNameList} key={elem} id={"emb" + elem} onClick={() => {this.setChordEmb(elem)}}>{this.state.chordEmbLabels[index]}
               </div>
             );
           }, this)}

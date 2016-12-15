@@ -3,7 +3,7 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: center;
-
+  font-family: sans-serif;
   box-sizing: border-box;
 }
 
@@ -44,13 +44,15 @@ body {
 }
 
 .disp-chord-labels,
-.scale-info-labels {
+.scale-info-labels,
+.settings-labels {
   width: 8%;
   min-width: 70px;
 }
 .disp-chord-data,
-.scale-info-data {
-  width: 15%;
+.scale-info-data,
+.settings-data {
+  width: 25%;
   min-width: 130px;
 }
 
@@ -102,6 +104,7 @@ body {
 .scale-button {
   width: 12%;
   height: 30%;
+  line-height: 50px;
 }
 
 .chord-mem-button:active {
@@ -117,6 +120,8 @@ body {
 .chord-options-button {
   width: 12%;
   height: 100%;
+  line-height: 30px;
+
 }
 
 .chord-options-button:active {
@@ -136,4 +141,14 @@ body {
   background-color: #e3e3e3;
   margin: .25%;
   border-radius: 3px;
+  text-align: center;
+}
+
+select {
+  border: none;
+  background-color: none;
+}
+
+.selected {
+  background-color: orange;
 }
