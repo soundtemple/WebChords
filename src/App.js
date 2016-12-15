@@ -15,6 +15,7 @@ var App = React.createClass({
       allNotes: ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],
       chordVarLabels: ['ROOT', 'SUS2', 'SUS4', ''],
       chordEmbLabels: ['TRIAD', '7TH', 'ADD9',''],
+      settingsButtons: ['#/b','','','','','','','','SHIFT','','','','','','',''],
       allModes: cc.getAllModes(),
       root: 60,
       scale: "major",
@@ -32,15 +33,19 @@ var App = React.createClass({
       chordNoteLetters: [],
       chordFreqs: [],
       chordFreqInt: [],
-      chordName: null
+      chordName: null,
+      octToggle: false,
+      pentToggle: false,
+      sharpFlatToggle: false,
+      shiftToggle: false
     }
   },
 
   setKey: function(event) {
     this.setState({root: event.target.value});
     cc.setKey(event.target.value);
-    var scaleNotes = cc.getScaleNotes(this.state.selectedMode);
-    var scaleSynthData = cc.getScaleSynthData(this.state.selectedMode)
+    var scaleNotes = cc.getScaleNotes(this.state.selectedMode, this.state.sharpFlatToggle);
+    var scaleSynthData = cc.getScaleSynthData(this.state.selectedMode, this.state.octToggle, this.state.sharpFlatToggle)
     this.setState({
       scaleNotes: scaleNotes,
       scaleSynthData: scaleSynthData
@@ -49,8 +54,8 @@ var App = React.createClass({
 
   setScale: function(event) {
     var selectedMode = cc.setScale(event.target.value);
-    var scaleNotes = cc.getScaleNotes(selectedMode);
-    var scaleSynthData = cc.getScaleSynthData(selectedMode)
+    var scaleNotes = cc.getScaleNotes(selectedMode, this.state.sharpFlatToggle);
+    var scaleSynthData = cc.getScaleSynthData(selectedMode, this.state.octToggle, this.state.sharpFlatToggle)
     this.setState({
       scale: event.target.value,
       selectedMode: selectedMode,
@@ -74,14 +79,28 @@ var App = React.createClass({
   },
 
   scalePlay: function(padID) {
-    if (padID == 8) {
-      console.log('Toggle Pentatonic');
-    } else if (padID == 17) {
-      console.log('Toggle octave adj');
-    } else {
-      console.log('play note need note name');
+    switch (padID) {
+    case 8:
+        console.log('Toggle Pentatonic= ' + this.state.pentToggle );
+        this.state.pentToggle = !this.state.pentToggle;
+        var pent = this.state.pentToggle;
+        this.setState({
+          pent: pent
+        });
+        break;
+    case 17:
+        this.state.octToggle = !this.state.octToggle;
+        var scaleSynthData = cc.getScaleSynthData(this.state.selectedMode, this.state.octToggle, this.state.sharpFlatToggle)
+        this.setState({
+          scaleSynthData: scaleSynthData,
+        });
+        break;
+    default:
+        console.log('play note need note name');
     }
+
   },
+
 
   padOn: function(btnNum) {
     btnNum = btnNum["elem"];
@@ -110,6 +129,30 @@ var App = React.createClass({
     webSynth.chordPlayOff(webSynth.oscillators);
   },
 
+  settings: function(btnNum) {
+    switch (btnNum) {
+    case 0:
+      this.state.sharpFlatToggle = !this.state.sharpFlatToggle;
+      console.log("sharp flat toggle=" + this.state.sharpFlatToggle);
+      var scaleNotes = cc.getScaleNotes(this.state.selectedMode, this.state.sharpFlatToggle);
+      var scaleSynthData = cc.getScaleSynthData(this.state.selectedMode, this.state.octToggle, this.state.sharpFlatToggle )
+      this.setState({
+        scaleNotes: scaleNotes,
+        scaleSynthData: scaleSynthData
+      });
+      break;
+    case 8:
+      this.state.shiftToggle = !this.state.shiftToggle;
+      var shift = this.state.shiftToggle;
+      console.log("shift toggle=" + this.state.shiftToggle);
+        this.setState({
+          shift: shift
+        });
+      break;
+    default:
+      console.log("No settings assigned");
+    }
+  },
 
 
   render: function() {
@@ -170,8 +213,15 @@ var App = React.createClass({
 
         <div className="settings-box">
           {_.range(16).map(function(elem, index) {
+            var classNameList = "button settings-button"
+            if (this.state.sharpFlatToggle && elem == 0) {
+              classNameList+= " selected";
+            };
+            if (this.state.shiftToggle && elem == 8) {
+              classNameList+= " shifted";
+            };
             return (
-              <div className="button settings-button" key={elem} id={"setting" + elem} onClick={() => {this.trigger("settings", {elem})}}>
+              <div className={classNameList} key={elem} id={"setting" + elem} onClick={() => {this.settings(elem)}}>{this.state.settingsButtons[index]}
               </div>
             );
           }, this)}
@@ -187,8 +237,15 @@ var App = React.createClass({
           }, this)}
           {/* scale play buttons*/}
           {_.range(18).map(function(elem, index) {
+            var classNameList = "button scale-button";
+            if (this.state.octToggle && index == 17) {
+              classNameList+= " selected";
+            };
+            if (this.state.pentToggle && index == 8) {
+              classNameList+= " selected";
+            };
             return (
-              <div className="button scale-button" key={elem} id={"scale" + elem} onClick={() => {this.scalePlay(elem)}}>{this.state.scaleSynthData[index]}
+              <div className={classNameList} key={elem} id={"scale" + elem} onClick={() => {this.scalePlay(elem)}}>{this.state.scaleSynthData[index]}
               </div>
             );
           }, this)}

@@ -52,8 +52,7 @@ var scale = "major",
     scaleSynthData = [],
     chordFreqs = [],
     chordNoteLetters = [],
-    noteInfo = {},
-    octToggle = 0
+    noteInfo = {}
 
 
 function createNotes() {
@@ -88,23 +87,35 @@ function setKey(newKey) {
   return rootNote
 }
 
-function getScaleNotes(selectedMode) {
+function getScaleNotes(selectedMode, sharpFlatToggle) {
   scaleNoteLetters = []; //reset array
+  var dispSharps = 0;
+  if (!sharpFlatToggle) {
+    dispSharps = 1;
+  }
   selectedMode.pattern.forEach(function (elem, index){
-    scaleNoteLetters[index] = midiNotesList[elem + rootNote][0];
+    scaleNoteLetters[index] = midiNotesList[elem + rootNote][dispSharps];
   })
   console.log('scale note letters are...'+scaleNoteLetters);
   return scaleNoteLetters
 };
 
-function getScaleSynthData(selectedMode) {
+function getScaleSynthData(selectedMode, octToggle, sharpFlatToggle) {
   var orderScalePads = [0,3,6,1,4,7,2,5,9,12,15,10,13,16,11,14]
   scaleSynthData = []; // reset array
   scaleSynthData[8] = "PENT";
   scaleSynthData[17] = "OCT+/-";
+  var dispSharps = 0;
+  if (!sharpFlatToggle) {
+    dispSharps = 1;
+  }
   selectedMode.pattern.forEach(function (elem, index){
-    scaleSynthData[orderScalePads[index]] = midiNotesList[elem + rootNote + octToggle][0];
-    scaleSynthData[orderScalePads[index] + 9] = midiNotesList[elem + rootNote + oneOctave + octToggle][0];
+    var OctaveAdj = 0;
+    if (octToggle) {
+      OctaveAdj = 12;
+    };
+    scaleSynthData[orderScalePads[index]] = midiNotesList[elem + rootNote + OctaveAdj ][dispSharps];
+    scaleSynthData[orderScalePads[index] + 9] = midiNotesList[elem + rootNote + oneOctave + OctaveAdj ][dispSharps];
   })
   console.log('scaleSynthData...'+scaleSynthData);
   return scaleSynthData
@@ -218,7 +229,7 @@ function getChordName(chordMidiNums) {
 };
 
 function scalePlay(padID) {
-  
+
 };
 
 

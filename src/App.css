@@ -94,6 +94,7 @@ body {
 .settings-button {
   width: 12%;
   height: 50%;
+  line-height: 30px;
 }
 
 .settings-button:active {
@@ -151,4 +152,8 @@ select {
 
 .selected {
   background-color: orange;
+}
+
+.shifted {
+  background-color: red;
 }
