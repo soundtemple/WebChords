@@ -37,11 +37,17 @@ body {
   margin: 2px;
 }
 
+select,
+button,
 .display-box p {
   font-size: 1.1em;
   font-family: "Courier";
   margin: 2px;
   padding: 1%;
+}
+
+button :active {
+  background-color: blue;
 }
 
 .disp-chord-labels,
@@ -146,7 +152,8 @@ body {
   text-align: center;
 }
 
-select {
+select,
+button {
   border: none;
   background-color: none;
 }

@@ -47,7 +47,7 @@ var scale = "major",
     scalePattern = [0,2,4,5,7,9,11,12],
     chordScaleDegs = [],
     chordMidiNums = [],
-    rootNote = 60,
+    rootNote = 48,
     scaleNoteLetters = [],
     scaleSynthData = [],
     chordFreqs = [],
@@ -84,10 +84,12 @@ function getAllModes() {
 
 function setKey(newKey) {
   rootNote = parseInt(newKey);
+  console.log(rootNote);
   return rootNote
 }
 
 function getScaleNotes(selectedMode, sharpFlatToggle) {
+  console.log('this is root note' + rootNote);
   scaleNoteLetters = []; //reset array
   var dispSharps = 0;
   if (!sharpFlatToggle) {
@@ -96,6 +98,7 @@ function getScaleNotes(selectedMode, sharpFlatToggle) {
   selectedMode.pattern.forEach(function (elem, index){
     scaleNoteLetters[index] = midiNotesList[elem + rootNote][dispSharps];
   })
+  console.log(scaleNoteLetters);
   return scaleNoteLetters
 };
 
@@ -219,6 +222,7 @@ function getChordNoteLetters(chordMidiNums) {
   chordMidiNums.forEach(function(item, index){
     chordNoteLetters[index] = midiNotesList[chordMidiNums[index]][1];
   });
+  console.log(chordNoteLetters);
   return chordNoteLetters;
 };
 
@@ -226,8 +230,8 @@ function getChordName(chordMidiNums) {
   console.log("ChordName");
 };
 
-function scalePlay(padID) {
-
+function cNotesToMidiIO(){
+  return chordNoteLetters
 };
 
 
@@ -250,5 +254,6 @@ module.exports = {
   getChordNoteLetters: getChordNoteLetters,
   midiNotesList: midiNotesList,
   chordScaleDegs: chordScaleDegs,
-  getChordName: getChordName
+  getChordName: getChordName,
+  cNotesToMidiIO: cNotesToMidiIO
 }

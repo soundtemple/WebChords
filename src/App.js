@@ -17,7 +17,7 @@ var App = React.createClass({
       chordEmbLabels: ['TRIAD', '7TH', 'ADD9',''],
       settingsButtons: ['#/b','','','','','','','','SHIFT','','','','','','',''],
       allModes: cc.getAllModes(),
-      root: 60,
+      root: 48,
       scale: "major",
       chordVariations: 0,
       chordEmb: 0,
@@ -38,12 +38,14 @@ var App = React.createClass({
       octToggle: false,
       pentToggle: false,
       sharpFlatToggle: false,
-      shiftToggle: false
+      shiftToggle: false,
+      midiInputList: ['Hit Connect IN'],
+      midiOutputList: ['Hit Connect OUT']
     }
   },
 
   setKey: function(event) {
-    this.setState({root: event.target.value});
+    console.log("this is event target value"+event.target.value);
     cc.setKey(event.target.value);
     var scaleNotes = cc.getScaleNotes(this.state.selectedMode, this.state.sharpFlatToggle);
     var scaleSynthData = cc.getScaleSynthData(this.state.selectedMode, this.state.octToggle, this.state.sharpFlatToggle)
@@ -173,6 +175,23 @@ var App = React.createClass({
     }
   },
 
+  refreshMidi: function() {
+    console.log("button clicked calling function");
+    var midiInputList = MidiIO.getMidiInputList();
+    var midiOutputList =  MidiIO.getMidiOutputList();
+    this.setState({
+      midiInputList: midiInputList,
+      midiOutputList: midiOutputList
+    })
+  },
+
+  setMidiIn: function() {
+    MidiIO.connectMidiInput('Ableton Push User Port');
+  },
+
+  setMidiOut: function() {
+    MidiIO.connectMidiOutput('Circuit');
+  },
 
   render: function() {
     return (
@@ -202,9 +221,9 @@ var App = React.createClass({
               <select onChange={this.setKey} >
                 {this.state.allNotes.map(function(elem, index) {
                   return (
-                    <option key={index} value={60 + index}>{elem}</option>
+                    <option key={index} value={parseInt(this.state.root) + index}>{elem}</option>
                   );
-                })}
+                }, this)}
               </select>
             </div>
             <div>
@@ -224,7 +243,21 @@ var App = React.createClass({
 
           </div>
           <div className="settings-data">
-
+            <select onClick={this.setMidiIn}>
+              {this.state.midiInputList.map(function(elem, index) {
+                return (
+                    <option key={index} value={elem}>{elem}</option>
+                )
+              })}
+            </select>
+            <select onClick={this.setMidiOut}>
+              {this.state.midiOutputList.map(function(elem, index) {
+                return (
+                    <option key={index} value={elem}>{elem}</option>
+                )
+              })}
+            </select>
+            <button onClick={this.refreshMidi}>Refresh Midi</button>
           </div>
 
         </div>
