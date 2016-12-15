@@ -5,10 +5,10 @@ var rootNote = 60,
     filterQ = 5,
     vca = 5,
     oscillators = [],
+    notes = [],
     context = new AudioContext();
 
 function chordPlayOn(chordFreqNotes, tetrad) {
-  console.log(chordFreqNotes);
 
   var masterVolume = context.createGain();
   var reverb = context.createConvolver();
@@ -74,9 +74,49 @@ function chordPlayOff(oscillators) {
   });
 };
 
+function notePlayOn(note) {
+  var masterVolume = context.createGain();
+  var biquadFilter = context.createBiquadFilter();
+
+  masterVolume.gain.value = vca;
+  biquadFilter.connect(masterVolume);
+  masterVolume.connect(context.destination);
+
+  var osc1 = context.createOscillator()
+
+  // set filter
+  biquadFilter.type = "lowpass";
+  biquadFilter.frequency.value = 450;
+  biquadFilter.gain.value = 25;
+  // biquadFilter.frequency.value = freqCutoff;
+  // biquadFilter.Q.value = filterQ;
+
+  // connect filter
+  osc1.connect(biquadFilter);
+
+  // oscillators = [osc1, osc2, osc3, osc4]
+  notes.push(osc1);
+
+  // set oscillator type
+  osc1.type = oscType;
+
+  osc1.frequency.value = note;
+
+  osc1.start(context.currentTime);
+
+};
+
+function notePlayOff() {
+  notes.forEach(function (note, index) {
+      note.stop(context.currentTime);
+  });
+};
+
 module.exports = {
   chordPlayOn: chordPlayOn,
   chordPlayOff: chordPlayOff,
+  notePlayOn: notePlayOn,
+  notePlayOff: notePlayOff,
   rootNote: rootNote,
   oscillators: oscillators,
 }

@@ -24,7 +24,7 @@ body {
   flex-direction: row;
   width: 98%;
   margin: 1%;
-  height: 15%;
+  height: 25%;
   border: 1px solid grey;
   border-radius: 5px;
   overflow: scroll;
@@ -38,21 +38,22 @@ body {
 }
 
 .display-box p {
-  font-size: .8em;
+  font-size: 1.1em;
   font-family: "Courier";
   margin: 2px;
+  padding: 1%;
 }
 
 .disp-chord-labels,
 .scale-info-labels,
 .settings-labels {
-  width: 8%;
+  width: 11%;
   min-width: 70px;
 }
 .disp-chord-data,
 .scale-info-data,
 .settings-data {
-  width: 25%;
+  width: 22%;
   min-width: 130px;
 }
 
@@ -80,7 +81,7 @@ body {
 }
 
 .mem-scale-box {
-  height: 30%;
+  height: 25%;
 }
 
 .chord-options-box {
@@ -88,7 +89,7 @@ body {
 }
 
 .chord-matrix-box {
-  height: 40%;
+  height: 35%;
 }
 
 .settings-button {
@@ -131,7 +132,7 @@ body {
 
 .chord-matrix-button {
   width: 12%;
-  height: 23%;
+  height: 22%;
 }
 
 .chord-matrix-button:active {

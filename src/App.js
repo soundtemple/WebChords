@@ -29,6 +29,7 @@ var App = React.createClass({
       chordInversion: null,
       chordOctAdj: null,
       chordScaleDegs: [],
+      midiNotesList: [],
       chordMidiNums: [],
       chordNoteLetters: [],
       chordFreqs: [],
@@ -96,9 +97,25 @@ var App = React.createClass({
         });
         break;
     default:
-        console.log('play note need note name');
-    }
+        var noteToPlay = this.state.scaleSynthData[padID];
+        var midiNotesList = cc.getAllNotes();
+        var checkSharps = 0;
+        if (!this.state.sharpFlatToggle) {
+          checkSharps = 1;
+        }
+        Object.keys(midiNotesList).map(function(elem, index) {
+          var thisNote = midiNotesList[elem][checkSharps];
+          if (noteToPlay == thisNote) {
+            var freqToPlay = cc.convertMidiToFreq(index);
+            webSynth.notePlayOn(freqToPlay);
+          }
+        });
 
+    }
+  },
+
+  scalePlayOff: function() {
+    webSynth.notePlayOff();
   },
 
 
@@ -124,6 +141,8 @@ var App = React.createClass({
     });
     webSynth.chordPlayOn(chordFreqs, this.state.chordEmb);
   },
+
+
 
   padOff: function(btnNum) {
     webSynth.chordPlayOff(webSynth.oscillators);
@@ -210,7 +229,6 @@ var App = React.createClass({
 
         </div>
 
-
         <div className="settings-box">
           {_.range(16).map(function(elem, index) {
             var classNameList = "button settings-button"
@@ -230,8 +248,12 @@ var App = React.createClass({
         <div className="mem-scale-box">
           {/* chord mem buttons*/}
           {_.range(6).map(function(elem, index) {
+            var classNameList = "button chord-mem-button";
+            if (this.state.shiftToggle) {
+              classNameList+= " shifted"
+            }
             return (
-              <div className="button chord-mem-button" key={elem} id={"mem" + elem} onClick={() => {this.trigger("mem", {elem})}}>MEM{index + 1}
+              <div className={classNameList} key={elem} id={"mem" + elem} onClick={() => {this.trigger("mem", {elem})}}>MEM{index + 1}
               </div>
             );
           }, this)}
@@ -245,7 +267,7 @@ var App = React.createClass({
               classNameList+= " selected";
             };
             return (
-              <div className={classNameList} key={elem} id={"scale" + elem} onClick={() => {this.scalePlay(elem)}}>{this.state.scaleSynthData[index]}
+              <div className={classNameList} key={elem} id={"scale" + elem} onMouseDown={() => {this.scalePlay(elem)}} onMouseUp={() => {this.scalePlayOff(elem)}} >{this.state.scaleSynthData[index]}
               </div>
             );
           }, this)}
@@ -284,7 +306,6 @@ var App = React.createClass({
           }, this)}
 
         </div>
-
 
       </div>
 

@@ -55,7 +55,7 @@ var scale = "major",
     noteInfo = {}
 
 
-function createNotes() {
+function getAllNotes() {
   var oct = -2
   for (var note=0; note<=128; note+=12) {
     noteInfo['' + (note)] = ['C' + oct, 'C' + oct],
@@ -73,10 +73,10 @@ function createNotes() {
     noteInfo['' + (note + 12)] = ['C' + oct, 'C' + oct];
     oct+=1;
   }
-  midiNotesList = noteInfo;
+  return midiNotesList = noteInfo;
 };
 
-createNotes();
+getAllNotes();
 
 function getAllModes() {
   return allModes
@@ -96,7 +96,6 @@ function getScaleNotes(selectedMode, sharpFlatToggle) {
   selectedMode.pattern.forEach(function (elem, index){
     scaleNoteLetters[index] = midiNotesList[elem + rootNote][dispSharps];
   })
-  console.log('scale note letters are...'+scaleNoteLetters);
   return scaleNoteLetters
 };
 
@@ -117,7 +116,6 @@ function getScaleSynthData(selectedMode, octToggle, sharpFlatToggle) {
     scaleSynthData[orderScalePads[index]] = midiNotesList[elem + rootNote + OctaveAdj ][dispSharps];
     scaleSynthData[orderScalePads[index] + 9] = midiNotesList[elem + rootNote + oneOctave + OctaveAdj ][dispSharps];
   })
-  console.log('scaleSynthData...'+scaleSynthData);
   return scaleSynthData
 };
 
@@ -234,7 +232,7 @@ function scalePlay(padID) {
 
 
 module.exports = {
-  createNotes: createNotes,
+  getAllNotes: getAllNotes,
   getAllModes: getAllModes,
   setKey: setKey,
   setScale: setScale,
