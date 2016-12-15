@@ -1,4 +1,4 @@
-const selectedMode = {
+const allModes = {
     major :   { "name" : "Major",
                 "pattern" : [0,2,4,5,7,9,11,12],
                 "notation" : ['I','ii','iii','IV','V','vi','viio','I']
@@ -8,6 +8,7 @@ const selectedMode = {
                 "notation" : ['i','iio','III','iv','v','VI','VII','i']
               }
     },
+
 
     inversionTable = {
       triads: {
@@ -37,8 +38,8 @@ const selectedMode = {
         "row0" : [0,0,0,-1,-1,-1,0,0]
       }
     },
-    oneOctave = 12,
-    rootNote = 60;
+    oneOctave = 12
+
 
 
 var scale = "major",
@@ -46,6 +47,7 @@ var scale = "major",
     scaleMidiNumbers = [0,2,4,5,7,9,11,12],
     chordScaleDegs = [],
     chordMidiNums = [],
+    rootNote = 60,
     chordFreqs = [],
     chordNoteLetters = [],
     noteInfo = {},
@@ -76,6 +78,24 @@ function createNotes() {
 };
 
 createNotes();
+
+function getAllModes() {
+  return allModes
+}
+
+function setKey(newKey) {
+  rootNote = parseInt(newKey);
+  return rootNote
+}
+
+function setScale(selectedScale) {
+  console.log(selectedScale);
+  var selectedMode = allModes[selectedScale];
+  console.log(selectedMode);
+  scaleMidiNumbers = selectedMode.pattern;
+  console.log(scaleMidiNumbers);
+  return selectedMode
+}
 
 function chordRootDegree(chordPadID) {
   return parseInt(chordPadID/4);
@@ -109,7 +129,8 @@ function getChordScaleDegs(chordRoot, inversionRow) {
       chordScaleDegs[index] = item;
     }
   });
-  return chordScaleDegs
+  console.log(chordScaleDegs);
+  return chordScaleDegs;
 };
 
 function getChordMidiNums(chordScaleDegs, chordInversion, chordOctAdj) {
@@ -144,6 +165,14 @@ function getChordFreqs(chordMidiNums) {
   return chordFreqs;
 };
 
+function getChordFreqInt(chordFreqs) {
+  var chordFreqInt = []; //reset array
+  chordFreqs.forEach(function(item, index){
+    chordFreqInt[index] = parseInt(chordFreqs[index])
+  });
+  return chordFreqInt;
+};
+
 function convertMidiToFreq(note) {
   return 440 * Math.pow(2, (note - 69) / 12);
 };
@@ -156,9 +185,16 @@ function getChordNoteLetters(chordMidiNums) {
   return chordNoteLetters;
 };
 
+function getChordName(chordMidiNums) {
+  console.log("ChordName");
+};
+
 
 module.exports = {
   createNotes: createNotes,
+  getAllModes: getAllModes,
+  setKey: setKey,
+  setScale: setScale,
   chordRootDegree: chordRootDegree,
   chordRow: chordRow,
   getChordInversion: getChordInversion,
@@ -166,8 +202,10 @@ module.exports = {
   getChordScaleDegs: getChordScaleDegs,
   getChordMidiNums: getChordMidiNums,
   getChordFreqs: getChordFreqs,
+  getChordFreqInt: getChordFreqInt,
   convertMidiToFreq: convertMidiToFreq,
   getChordNoteLetters: getChordNoteLetters,
   midiNotesList: midiNotesList,
-  chordScaleDegs: chordScaleDegs
+  chordScaleDegs: chordScaleDegs,
+  getChordName: getChordName
 }

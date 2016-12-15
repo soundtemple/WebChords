@@ -21,7 +21,7 @@ body {
 
 .display-box {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   width: 98%;
   margin: 1%;
   height: 15%;
@@ -38,10 +38,22 @@ body {
 }
 
 .display-box p {
-  font-size: .9em;
+  font-size: .8em;
   font-family: "Courier";
   margin: 2px;
 }
+
+.disp-chord-labels,
+.scale-info-labels {
+  width: 8%;
+  min-width: 70px;
+}
+.disp-chord-data,
+.scale-info-data {
+  width: 15%;
+  min-width: 130px;
+}
+
 
 .settings-box,
 .chord-options-box {
