@@ -29,7 +29,7 @@ const allModes = {
         "row3" : [1,1,1,0,0,0,0,1],
         "row2" : [0,0,0,0,0,0,0,1],
         "row1" : [0,0,0,0,0,-1,-1,0],
-        "row0" : [0,0,0,0,-1,-1,-1,0]
+        "row0" : [0,0,0,-1,-1,-1,-1,0]
               },
       tetrads: {
         "row3" : [0,0,0,0,0,0,0,1],
@@ -84,12 +84,10 @@ function getAllModes() {
 
 function setKey(newKey) {
   rootNote = parseInt(newKey);
-  console.log(rootNote);
   return rootNote
 }
 
 function getScaleNotes(selectedMode, sharpFlatToggle) {
-  console.log('this is root note' + rootNote);
   scaleNoteLetters = []; //reset array
   var dispSharps = 0;
   if (!sharpFlatToggle) {
@@ -98,7 +96,6 @@ function getScaleNotes(selectedMode, sharpFlatToggle) {
   selectedMode.pattern.forEach(function (elem, index){
     scaleNoteLetters[index] = midiNotesList[elem + rootNote][dispSharps];
   })
-  console.log(scaleNoteLetters);
   return scaleNoteLetters
 };
 
@@ -128,27 +125,11 @@ function setScale(selectedScale) {
   return selectedMode
 }
 
-function chordRootDegree(chordPadID) {
-  return parseInt(chordPadID/4);
-};
-
-function chordRow(chordPadID, degree) {
-  return ( (chordPadID/4) - degree ) * 4;
-};
-
-function getChordInversion(chordRoot, chordRow) {
-  var rowNum = "row" + chordRow;
-  return inversionTable['triads'][rowNum][chordRoot];
-};
-
-function getChordOctaveAdj(chordRoot, chordRow) {
-  var rowNum = "row" + chordRow;
-  return octaveAdjTable['triads'][rowNum][chordRoot];
-};
-
-function getChordScaleDegs(chordRoot, inversionRow, chordVariations, chordEmb) {
+function getChordScaleDegs(btnNum, chordVariations, chordEmb) {
+  var chordRoot = btnNum%8;
   var suspension = 0;
   chordScaleDegs = [];
+  // suspended chord adj.
   if (chordVariations == 1) {
       suspension = -1;
   } else if (chordVariations == 2) {
@@ -158,12 +139,13 @@ function getChordScaleDegs(chordRoot, inversionRow, chordVariations, chordEmb) {
   chordScaleDegs[0] = chordRoot;
   chordScaleDegs[1] = chordRoot + 2 + suspension;
   chordScaleDegs[2] = chordRoot + 4;
-  console.log(chordEmb + '=chord emb');
+  // adj for 7th or Add9 chord
   if (chordEmb == 1) {
     chordScaleDegs[3] = chordRoot + 6; //6 scale degrees to add 7th;
   } else if (chordEmb == 2) {
     chordScaleDegs[3] = chordRoot + 8; //8 scale degrees to add 9th;
   };
+  // adj so scale degrees in same octave.
   chordScaleDegs.forEach(function(item, index) {
     if (item > 7) {
       item-= 7;
@@ -173,29 +155,44 @@ function getChordScaleDegs(chordRoot, inversionRow, chordVariations, chordEmb) {
   return chordScaleDegs;
 };
 
-function getChordMidiNums(chordScaleDegs, chordInversion, chordOctAdj) {
+function getChordMidiNums(btnNum, chordScaleDegs) {
+  var chordRow = parseInt(btnNum/8) // row determines inversion
   chordMidiNums = []; // reset array
-  chordOctAdj = chordOctAdj * oneOctave;
   chordScaleDegs.forEach(function(item, index){
-    chordMidiNums[index] = scalePattern[ chordScaleDegs[index] - 1 ];
-    chordMidiNums[index] += chordOctAdj + rootNote;
+    chordMidiNums[index] = scalePattern[ chordScaleDegs[index] - 1 ] + rootNote;
+    // adj for last column root up one octave.
+    if (btnNum%8 == 7) {
+      chordMidiNums[index]+= 12;
+    }
   });
-  // adjust for inversion
-  if (chordInversion == 1) {
-    console.log('1st invesion adj');
-    chordMidiNums[0] += oneOctave;
-  } else if (chordInversion == 2) {
-    console.log('2nd invesion adj');
-    chordMidiNums[0] += oneOctave;
-    chordMidiNums[1] += oneOctave;
-  } else if (chordInversion == 3) {
-    console.log('3rd invesion adj');
-    chordMidiNums[0] += oneOctave;
-    chordMidiNums[1] += oneOctave;
-    chordMidiNums[2] += oneOctave;
-  };
-  return chordMidiNums;
+  switch(chordRow) {
+    case 1:
+        chordMidiNums[0] += oneOctave;
+        break;
+    case 2:
+        chordMidiNums[0] += oneOctave;
+        chordMidiNums[1] += oneOctave;
+        break;
+    case 3:
+        chordMidiNums[0] += oneOctave;
+        chordMidiNums[1] += oneOctave;
+        chordMidiNums[2] += oneOctave;
+        break;
+    default:
+        break;
+  }
+  return chordMidiNums.sort();
 };
+
+function getOrderChordDegs(scaleNotes, chordNoteLetters) {
+  var orderChordDegs = [];
+  console.log('this is the scale notes= '+scaleNotes);
+  console.log('this is the chordNoteLetters= '+chordNoteLetters);
+  chordNoteLetters.forEach(function(item, index){
+    orderChordDegs[index] = scaleNotes.indexOf(chordNoteLetters[index])
+  });
+  return orderChordDegs;
+}
 
 function getChordFreqs(chordMidiNums) {
   chordFreqs = []; // reset array
@@ -235,6 +232,7 @@ function cNotesToMidiIO(){
 };
 
 
+
 module.exports = {
   getAllNotes: getAllNotes,
   getAllModes: getAllModes,
@@ -242,10 +240,6 @@ module.exports = {
   setScale: setScale,
   getScaleNotes: getScaleNotes,
   getScaleSynthData: getScaleSynthData,
-  chordRootDegree: chordRootDegree,
-  chordRow: chordRow,
-  getChordInversion: getChordInversion,
-  getChordOctaveAdj: getChordOctaveAdj,
   getChordScaleDegs: getChordScaleDegs,
   getChordMidiNums: getChordMidiNums,
   getChordFreqs: getChordFreqs,
@@ -255,5 +249,6 @@ module.exports = {
   midiNotesList: midiNotesList,
   chordScaleDegs: chordScaleDegs,
   getChordName: getChordName,
-  cNotesToMidiIO: cNotesToMidiIO
+  cNotesToMidiIO: cNotesToMidiIO,
+  getOrderChordDegs: getOrderChordDegs
 }
