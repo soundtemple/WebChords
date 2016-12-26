@@ -128,8 +128,8 @@ var App = React.createClass({
     var chordNoteLetters = cc.getChordNoteLetters(chordMidiNums);
     var chordFreqs = cc.getChordFreqs(chordMidiNums);
     var chordFreqInt = cc.getChordFreqInt(chordFreqs);
-    var chordName = cc.getChordName(chordScaleDegs);
-    var orderChordDegs = cc.getOrderChordDegs(this.state.scaleNotes, chordNoteLetters)
+    var chordName = cc.getChordName(btnNum, chordScaleDegs);
+    var orderChordDegs = cc.getOrderChordDegs(chordNoteLetters)
     this.setState({
       chordScaleDegs: chordScaleDegs,
       chordMidiNums: chordMidiNums,
@@ -203,7 +203,7 @@ var App = React.createClass({
             <div><p>FREQ'S:</p></div>
           </div>
           <div className="disp-chord-data">
-            <div><p>Something</p></div>
+            <div><p>{this.state.chordName}</p></div>
             <div><p>{this.state.chordNoteLetters.join(' ')}</p></div>
             <div><p>{this.state.orderChordDegs.join(' ')}</p></div>
             <div><p>{this.state.chordMidiNums.join(' ')}</p></div>

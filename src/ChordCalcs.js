@@ -9,35 +9,6 @@ const allModes = {
               }
     },
 
-
-    inversionTable = {
-      triads: {
-        "row3" : [0,0,0,2,2,1,1,1],
-        "row2" : [2,2,2,1,1,0,0,0],
-        "row1" : [1,1,1,0,0,2,2,2],
-        "row0" : [0,0,0,2,2,1,1,1]
-              },
-      tetrads: {
-        "row3" : [3,3,3,2,2,0,0,0],
-        "row2" : [2,2,2,1,1,3,3,3],
-        "row1" : [1,1,1,0,0,2,2,2],
-        "row0" : [0,0,0,3,3,1,1,1]
-      }
-    },
-    octaveAdjTable = {
-      triads: {
-        "row3" : [1,1,1,0,0,0,0,1],
-        "row2" : [0,0,0,0,0,0,0,1],
-        "row1" : [0,0,0,0,0,-1,-1,0],
-        "row0" : [0,0,0,-1,-1,-1,-1,0]
-              },
-      tetrads: {
-        "row3" : [0,0,0,0,0,0,0,1],
-        "row2" : [0,0,0,0,0,-1,-1,0],
-        "row1" : [0,0,0,0,0,-1,-1,0],
-        "row0" : [0,0,0,-1,-1,-1,0,0]
-      }
-    },
     oneOctave = 12
 
 
@@ -49,6 +20,7 @@ var scale = "major",
     chordMidiNums = [],
     rootNote = 48,
     scaleNoteLetters = [],
+    scaleNotesStripOctave = [],
     scaleSynthData = [],
     chordFreqs = [],
     chordNoteLetters = [],
@@ -95,9 +67,19 @@ function getScaleNotes(selectedMode, sharpFlatToggle) {
   }
   selectedMode.pattern.forEach(function (elem, index){
     scaleNoteLetters[index] = midiNotesList[elem + rootNote][dispSharps];
-  })
+  });
+  octaveStrip(scaleNoteLetters);
   return scaleNoteLetters
 };
+
+function octaveStrip(notes){
+  scaleNotesStripOctave = [];
+  notes.forEach(function(note, index){
+    scaleNotesStripOctave[index] = note.substring(0, note.length - 1);
+  });
+  console.log('octave strip= '+scaleNotesStripOctave);
+  return scaleNotesStripOctave;
+}
 
 function getScaleSynthData(selectedMode, octToggle, sharpFlatToggle) {
   var orderScalePads = [0,3,6,1,4,7,2,5,9,12,15,10,13,16,11,14]
@@ -152,6 +134,7 @@ function getChordScaleDegs(btnNum, chordVariations, chordEmb) {
       chordScaleDegs[index] = item;
     }
   });
+  console.log('these are the scale degs...'+chordScaleDegs);
   return chordScaleDegs;
 };
 
@@ -165,6 +148,9 @@ function getChordMidiNums(btnNum, chordScaleDegs) {
       chordMidiNums[index]+= 12;
     }
   });
+  // sort midi numbers so lowest notes are inverted
+  chordMidiNums = chordMidiNums.sort();
+  // inversions - based on row.
   switch(chordRow) {
     case 1:
         chordMidiNums[0] += oneOctave;
@@ -181,15 +167,21 @@ function getChordMidiNums(btnNum, chordScaleDegs) {
     default:
         break;
   }
+
   return chordMidiNums.sort();
 };
 
-function getOrderChordDegs(scaleNotes, chordNoteLetters) {
+function getOrderChordDegs(chordNoteLetters) {
   var orderChordDegs = [];
-  console.log('this is the scale notes= '+scaleNotes);
-  console.log('this is the chordNoteLetters= '+chordNoteLetters);
-  chordNoteLetters.forEach(function(item, index){
-    orderChordDegs[index] = scaleNotes.indexOf(chordNoteLetters[index])
+  var chordLettersStrip = [];
+  // remove octave naming
+  chordNoteLetters.forEach(function(note, index){
+    chordLettersStrip[index] = note.substring(0, note.length - 1);
+  })
+  console.log('this is the scale notes= '+scaleNotesStripOctave);
+  console.log('this is the chordNoteLetters= '+chordLettersStrip);
+  chordLettersStrip.forEach(function(note, index){
+    orderChordDegs[index] = scaleNotesStripOctave.indexOf(chordLettersStrip[index]) + 1;
   });
   return orderChordDegs;
 }
@@ -223,8 +215,14 @@ function getChordNoteLetters(chordMidiNums) {
   return chordNoteLetters;
 };
 
-function getChordName(chordMidiNums) {
+function getChordName(btnNum, chordMidiNums) {
   console.log("ChordName");
+  var chordName = '';
+  var letter = scaleNotesStripOctave[btnNum%8];
+  var type = 'Major';
+  var embel = '';
+  chordName = letter + ' ' + type + ' ' + embel;
+  return chordName
 };
 
 function cNotesToMidiIO(){
