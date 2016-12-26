@@ -8,7 +8,6 @@ const allModes = {
                 "notation" : ['i','iio','III','iv','v','VI','VII','i']
               }
     },
-
     oneOctave = 12
 
 
@@ -206,10 +205,14 @@ function convertMidiToFreq(note) {
   return 440 * Math.pow(2, (note - 69) / 12);
 };
 
-function getChordNoteLetters(chordMidiNums) {
+function getChordNoteLetters(chordMidiNums, sharpFlatToggle) {
   chordNoteLetters = []; //reset array
+  var dispSharps = 0;
+  if (!sharpFlatToggle) {
+    dispSharps = 1;
+  }
   chordMidiNums.forEach(function(item, index){
-    chordNoteLetters[index] = midiNotesList[chordMidiNums[index]][1];
+    chordNoteLetters[index] = midiNotesList[chordMidiNums[index]][dispSharps];
   });
   console.log(chordNoteLetters);
   return chordNoteLetters;
