@@ -128,8 +128,8 @@ var App = React.createClass({
     var chordNoteLetters = cc.getChordNoteLetters(chordMidiNums, this.state.sharpFlatToggle);
     var chordFreqs = cc.getChordFreqs(chordMidiNums);
     var chordFreqInt = cc.getChordFreqInt(chordFreqs);
-    var chordName = cc.getChordName(btnNum, chordScaleDegs);
     var orderChordDegs = cc.getOrderChordDegs(chordNoteLetters)
+    var chordName = cc.getChordName(btnNum, chordMidiNums);
     this.setState({
       chordScaleDegs: chordScaleDegs,
       chordMidiNums: chordMidiNums,

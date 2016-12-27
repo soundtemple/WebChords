@@ -8,6 +8,43 @@ const allModes = {
                 "notation" : ['i','iio','III','iv','v','VI','VII','i']
               }
     },
+    chordCodes = {
+      "34" : [ "Minor R", 0 ],
+      "43" : [ "Major R", 0 ],
+      "35" : [ "Major 1", 0 ],
+      "54" : [ "Major 2", 0 ],
+      "45" : [ "Minor 1", 0 ],
+      "53" : [ "Minor 2", 0 ],
+      "33" : [ "Dim. R", 0 ],
+      "36" : [ "Dim. 1", 0 ],
+      "63" : [ "Dim. 2", 0 ],
+      "25" : [ "Sus2", 0 ],
+      "55" : [ "Stacked P4's", 1 ],
+      "52" : [ "Sus4", 1 ],
+      "16" : [ "Sus2", 0 ],
+      "15" : [ "Sus2", 0 ],
+      "65" : [ "Stacked 4ths", 1 ],
+      "51" : [ "Sus4", 1 ],
+      "56" : [ "Stacked 4ths", 1 ],
+      "61" : [ "Sus4", 0 ],
+      "434": [ "Major 7th R", 0],
+      "341": [ "Major 7th 1", 0],
+      "414": [ "Major 7th 2", 0],
+      "143": [ "Major 7th 3", 0],
+      "234": [ "Minor 7th R", 0],
+      "343": [ "Major 7th 1", 0],
+      "432": [ "Major 7th 2", 0],
+      "323": [ "Major 7th 3", 0],
+      "433": [ "Dom. 7th R", 0],
+      "332": [ "Dom. 7th 1", 0],
+      "324": [ "Dom. 7th 2", 0],
+      "243": [ "Dom. 7th 3", 0],
+      "334": [ "Dim. 7th R", 0],
+      "342": [ "Dim. 7th 1", 0],
+      "423": [ "Dim. 7th 2", 0],
+      "233": [ "Dim. 7th 3", 0]
+
+    },
     oneOctave = 12
 
 
@@ -20,6 +57,7 @@ var scale = "major",
     rootNote = 48,
     scaleNoteLetters = [],
     scaleNotesStripOctave = [],
+    chordLettersStrip = [],
     scaleSynthData = [],
     chordFreqs = [],
     chordNoteLetters = [],
@@ -172,7 +210,7 @@ function getChordMidiNums(btnNum, chordScaleDegs) {
 
 function getOrderChordDegs(chordNoteLetters) {
   var orderChordDegs = [];
-  var chordLettersStrip = [];
+  chordLettersStrip = [];
   // remove octave naming
   chordNoteLetters.forEach(function(note, index){
     chordLettersStrip[index] = note.substring(0, note.length - 1);
@@ -221,15 +259,36 @@ function getChordNoteLetters(chordMidiNums, sharpFlatToggle) {
 function getChordName(btnNum, chordMidiNums) {
   console.log("ChordName");
   var chordName = '';
+  var chordCode = getChordType(chordMidiNums);
   var letter = scaleNotesStripOctave[btnNum%8];
-  var type = 'Major';
+  if (chordCode[1] != 0) {
+    var currChordNotes = ChordNoteLet();
+    letter = currChordNotes[0];
+  }
+  var type = chordCode[0];
   var embel = '';
   chordName = letter + ' ' + type + ' ' + embel;
   return chordName
 };
 
-function cNotesToMidiIO(){
-  return chordNoteLetters
+function getChordType(chordMidiNums) {
+  var chordCode = [];
+  chordCode[0] = chordMidiNums[1] - chordMidiNums[0];
+  chordCode[1] = chordMidiNums[2] - chordMidiNums[1];
+  if (chordMidiNums.length == 4) {
+    chordCode[2] = chordMidiNums[3] - chordMidiNums[2];
+  };
+  console.log(chordCode);
+  var chordName = chordCodes[chordCode.join('')]
+  if (chordName == undefined) {
+    chordName = [chordCode.join(''), 0]
+  }
+  return chordName
+};
+
+// returns current chord note letters without octave number
+function ChordNoteLet(){
+  return chordLettersStrip
 };
 
 
@@ -250,6 +309,5 @@ module.exports = {
   midiNotesList: midiNotesList,
   chordScaleDegs: chordScaleDegs,
   getChordName: getChordName,
-  cNotesToMidiIO: cNotesToMidiIO,
   getOrderChordDegs: getOrderChordDegs
 }
