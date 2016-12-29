@@ -159,7 +159,7 @@ function getChordScaleDegs(btnNum, chordVariations, chordEmb) {
   chordScaleDegs[1] = chordRoot + 2 + suspension;
   chordScaleDegs[2] = chordRoot + 4;
   // adj for 7th or Add9 chord
-  if (chordEmb == 1) {
+  if (chordEmb > 0) {
     chordScaleDegs[3] = chordRoot + 6; //6 scale degrees to add 7th;
   } else if (chordEmb == 2) {
     chordScaleDegs[3] = chordRoot + 8; //8 scale degrees to add 9th;
