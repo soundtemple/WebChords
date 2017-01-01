@@ -36,7 +36,7 @@ body {
 .display-box h1 {
   font-size: .8em;
   font-family: "Courier";
-  font-weight: bold;
+  /*font-weight: bold;*/
   margin: 2px;
 }
 
@@ -46,7 +46,7 @@ button,
   font-size: 1.1em;
   font-family: "Courier";
   margin: 2px;
-  padding: 1%;
+  /*padding: 1%;*/
 }
 
 button :active {
@@ -56,13 +56,13 @@ button :active {
 .disp-chord-labels,
 .scale-info-labels,
 .settings-labels {
-  width: 11%;
+  width: 12%;
   min-width: 70px;
 }
 .disp-chord-data,
 .scale-info-data,
 .settings-data {
-  width: 22%;
+  width: 20%;
   min-width: 130px;
 }
 

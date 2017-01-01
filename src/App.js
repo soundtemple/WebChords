@@ -14,19 +14,18 @@ var App = React.createClass({
     return {
       allNotes: ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],
       chordVarLabels: ['ROOT', 'SUS2', 'SUS4', ''],
-      chordEmbLabels: ['TRIAD', '7TH', 'ADD9',''],
+      tetradLabels: ['TRIAD', '7TH', 'ADD9',''],
       settingsButtons: ['#/b','','','','','','','','SHIFT','','','','','','',''],
       allModes: cc.getAllModes(),
       root: 48,
       scale: "major",
       chordVariations: 0,
-      chordEmb: 0,
+      tetrad: 0,
       selectedMode: cc.setScale("major"),
       scaleNotes: [],
       scaleSynthData: [],
       chordRoot: null,
       chordRow: null,
-      chordInversion: null,
       chordOctAdj: null,
       chordScaleDegs: [],
       midiNotesList: [],
@@ -74,10 +73,10 @@ var App = React.createClass({
     })
   },
 
-  setChordEmb: function(pad) {
-    var chordEmb = pad;
+  setTetrad: function(pad) {
+    var tetrad = pad;
     this.setState({
-      chordEmb: chordEmb,
+      tetrad: tetrad,
     })
   },
 
@@ -123,13 +122,16 @@ var App = React.createClass({
 
   padOn: function(btnNum) {
     btnNum = btnNum["elem"];
-    var chordScaleDegs = cc.getChordScaleDegs(btnNum, this.state.chordVariations, this.state.chordEmb);
+    var chordScaleDegs = cc.getChordScaleDegs(btnNum, this.state.chordVariations, this.state.tetrad);
     var chordMidiNums = cc.getChordMidiNums(btnNum, chordScaleDegs);
     var chordNoteLetters = cc.getChordNoteLetters(chordMidiNums, this.state.sharpFlatToggle);
     var chordFreqs = cc.getChordFreqs(chordMidiNums);
     var chordFreqInt = cc.getChordFreqInt(chordFreqs);
     var orderChordDegs = cc.getOrderChordDegs(chordNoteLetters)
-    var chordName = cc.getChordName(btnNum, chordMidiNums);
+    var chordName = cc.getChordName(btnNum, chordMidiNums, this.state.tetrad, this.state.chordVariations, this.state.scale);
+    var chordInversion = cc.getChordInversion(chordScaleDegs, orderChordDegs, this.state.chordVariations);
+    var chordIntervals = cc.getChordIntervals();
+    console.log(chordInversion);
     this.setState({
       chordScaleDegs: chordScaleDegs,
       chordMidiNums: chordMidiNums,
@@ -137,9 +139,11 @@ var App = React.createClass({
       chordFreqs: chordFreqs,
       chordFreqInt: chordFreqInt,
       chordName: chordName,
-      orderChordDegs: orderChordDegs
+      orderChordDegs: orderChordDegs,
+      chordInversion: chordInversion,
+      chordIntervals: chordIntervals,
     });
-    webSynth.chordPlayOn(chordFreqs, this.state.chordEmb);
+    webSynth.chordPlayOn(chordFreqs, this.state.tetrad);
   },
 
 
@@ -197,6 +201,8 @@ var App = React.createClass({
         <div className="display-box">
           <div className="disp-chord-labels">
             <div><p>NAME:</p></div>
+            <div><p>INV:</p></div>
+            <div><p>INT:</p></div>
             <div><p>NOTES:</p></div>
             <div><p>DEGS:</p></div>
             <div><p>MIDI#:</p></div>
@@ -204,6 +210,8 @@ var App = React.createClass({
           </div>
           <div className="disp-chord-data">
             <div><p>{this.state.chordName}</p></div>
+            <div><p>{this.state.chordInversion}</p></div>
+            <div><p>{this.state.chordIntervals}</p></div>
             <div><p>{this.state.chordNoteLetters.join(' ')}</p></div>
             <div><p>{this.state.orderChordDegs.join(' ')}</p></div>
             <div><p>{this.state.chordMidiNums.join(' ')}</p></div>
@@ -317,11 +325,11 @@ var App = React.createClass({
           }, this)}
           {_.range(4).map(function(elem, index) {
             var classNameList = "button chord-options-button"
-            if (this.state.chordEmb == elem) {
+            if (this.state.tetrad == elem) {
               classNameList += " selected";
             }
             return (
-              <div className={classNameList} key={elem} id={"emb" + elem} onClick={() => {this.setChordEmb(elem)}}>{this.state.chordEmbLabels[index]}
+              <div className={classNameList} key={elem} id={"emb" + elem} onClick={() => {this.setTetrad(elem)}}>{this.state.tetradLabels[index]}
               </div>
             );
           }, this)}

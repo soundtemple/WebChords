@@ -1,3 +1,5 @@
+import _ from "underscore";
+
 const allModes = {
     major :   { "name" : "Major",
                 "pattern" : [0,2,4,5,7,9,11,12],
@@ -8,42 +10,74 @@ const allModes = {
                 "notation" : ['i','iio','III','iv','v','VI','VII','i']
               }
     },
+    intervals = {
+      "0" : "Unison",
+      "1" : "m2",
+      "2" : "M2",
+      "3" : "m3",
+      "4" : "M3",
+      "5" : "P4",
+      "6" : "TT",
+      "7" : "P5",
+      "8" : "m6",
+      "9" : "M6",
+      "10" : "m7",
+      "11" : "M7",
+      "12" : "Oct"
+    },
     chordCodes = {
-      "34" : [ "Minor R", 0 ],
-      "43" : [ "Major R", 0 ],
-      "35" : [ "Major 1", 0 ],
-      "54" : [ "Major 2", 0 ],
-      "45" : [ "Minor 1", 0 ],
-      "53" : [ "Minor 2", 0 ],
-      "33" : [ "Dim. R", 0 ],
-      "36" : [ "Dim. 1", 0 ],
-      "63" : [ "Dim. 2", 0 ],
-      "25" : [ "Sus2", 0 ],
-      "55" : [ "Stacked P4's", 1 ],
-      "52" : [ "Sus4", 1 ],
-      "16" : [ "Sus2", 0 ],
-      "15" : [ "Sus2", 0 ],
-      "65" : [ "Stacked 4ths", 1 ],
-      "51" : [ "Sus4", 1 ],
-      "56" : [ "Stacked 4ths", 1 ],
-      "61" : [ "Sus4", 0 ],
-      "434": [ "Major 7th R", 0],
-      "341": [ "Major 7th 1", 0],
-      "414": [ "Major 7th 2", 0],
-      "143": [ "Major 7th 3", 0],
-      "234": [ "Minor 7th R", 0],
-      "343": [ "Major 7th 1", 0],
-      "432": [ "Major 7th 2", 0],
-      "323": [ "Major 7th 3", 0],
-      "433": [ "Dom. 7th R", 0],
-      "332": [ "Dom. 7th 1", 0],
-      "324": [ "Dom. 7th 2", 0],
-      "243": [ "Dom. 7th 3", 0],
-      "334": [ "Dim. 7th R", 0],
-      "342": [ "Dim. 7th 1", 0],
-      "423": [ "Dim. 7th 2", 0],
-      "233": [ "Dim. 7th 3", 0]
-
+      // "34" : "Minor",
+      // "43" : "Major",
+      // "35" : "Major",
+      // "54" : "Major",
+      // "45" : "Minor",
+      // "53" : "Minor",
+      // "33" : "Dim.",
+      // "36" : "Dim.",
+      // "63" : "Dim.",
+      "25" : "Sus2",
+      "55" : "Stacked P4's",
+      "52" : "Sus4",
+      "16" : "Sus2",
+      "15" : "Sus2",
+      "65" : "Stacked 4ths",
+      "51" : "Sus4",
+      "56" : "Stacked 4ths",
+      "61" : "Sus4",
+      // 7th chords
+      // "434": "Major",
+      // "341": "Major",
+      // "414": "Major",
+      // "143": "Major",
+      // "234": "Minor",
+      // "343": "Major",
+      // "432": "Major",
+      // "323": "Major",
+      "433": "Dom.",
+      "332": "Dom.",
+      "324": "Dom.",
+      "243": "Dom.",
+      // "334": "Dim.",
+      // "342": "Dim.",
+      // "423": "Dim.",
+      // "233": "Dim.",
+      // add 9 chords
+      // "223": "Major",
+      // "214": "Minor",
+      // "124": "Minor",
+      // "235": "Major",
+      // "145": "Minor",
+      // "245": "Minor",
+      // "352": "Major",
+      // "452": "Major",
+      // "451": "Major",
+      // "522": "Major",
+      // "521": "Major",
+      // "512": "Major",
+      // "236": "Dim.",
+      // "361": "Dim.",
+      // "612": "Dim.",
+      // "123": "Dim.",
     },
     oneOctave = 12
 
@@ -61,7 +95,9 @@ var scale = "major",
     scaleSynthData = [],
     chordFreqs = [],
     chordNoteLetters = [],
-    noteInfo = {}
+    noteInfo = {},
+    chordInversion = 0,
+    chordIntervals = []
 
 
 function getAllNotes() {
@@ -159,10 +195,11 @@ function getChordScaleDegs(btnNum, chordVariations, chordEmb) {
   chordScaleDegs[1] = chordRoot + 2 + suspension;
   chordScaleDegs[2] = chordRoot + 4;
   // adj for 7th or Add9 chord
-  if (chordEmb > 0) {
-    chordScaleDegs[3] = chordRoot + 6; //6 scale degrees to add 7th;
-  } else if (chordEmb == 2) {
-    chordScaleDegs[3] = chordRoot + 8; //8 scale degrees to add 9th;
+  if (chordEmb == 1) {
+    chordScaleDegs[3] = chordRoot + 6; //6 semitones degrees to add 7th;
+  };
+  if (chordEmb == 2) {
+    chordScaleDegs[3] = chordRoot + 1; //1 semitone degrees to add 9th or 2nd;
   };
   // adj so scale degrees in same octave.
   chordScaleDegs.forEach(function(item, index) {
@@ -220,6 +257,7 @@ function getOrderChordDegs(chordNoteLetters) {
   chordLettersStrip.forEach(function(note, index){
     orderChordDegs[index] = scaleNotesStripOctave.indexOf(chordLettersStrip[index]) + 1;
   });
+  console.log('this is the orderchord degs= ' + orderChordDegs);
   return orderChordDegs;
 }
 
@@ -256,35 +294,108 @@ function getChordNoteLetters(chordMidiNums, sharpFlatToggle) {
   return chordNoteLetters;
 };
 
-function getChordName(btnNum, chordMidiNums) {
-  console.log("ChordName");
+function getChordName(btnNum, chordMidiNums, embel, suspended, scale) {
+  console.log("embel=" + embel);
+  var tetrad
   var chordName = '';
-  var chordCode = getChordType(chordMidiNums);
+  var type = getChordType(chordMidiNums, btnNum, scale);
   var letter = scaleNotesStripOctave[btnNum%8];
-  if (chordCode[1] != 0) {
+  // suspended chords use lowest note for name
+  if (suspended > 0) {
     var currChordNotes = ChordNoteLet();
     letter = currChordNotes[0];
   }
-  var type = chordCode[0];
-  var embel = '';
-  chordName = letter + ' ' + type + ' ' + embel;
+  switch(embel) {
+    case 1:
+        tetrad = '7th'
+        break;
+    case 2:
+        tetrad = 'Add 9'
+        break;
+    default:
+        tetrad = ''
+}
+  chordName = letter + ' ' + type + ' ' + tetrad;
   return chordName
 };
 
-function getChordType(chordMidiNums) {
-  var chordCode = [];
-  chordCode[0] = chordMidiNums[1] - chordMidiNums[0];
-  chordCode[1] = chordMidiNums[2] - chordMidiNums[1];
+function getChordType(chordMidiNums, btnNum, scale) {
+  var chordName = '';
+  // get chord type based on scale degree and triad code in allModes object
+  var chordOnDegree = btnNum%8;
+  var chordRomNum = allModes[scale].notation[chordOnDegree];
+  if (chordRomNum == chordRomNum.toLowerCase()) {
+    chordName = 'Minor'
+  }
+  if (chordRomNum == chordRomNum.toUpperCase()) {
+    chordName = 'Major'
+  }
+  if (chordRomNum.includes("o")) {
+    chordName = 'Dim.'
+  }
+  // check for edge cases. based on specfic chord note intervals
+  chordIntervals = [];
+  // calc chord intervals
+  chordIntervals[0] = chordMidiNums[1] - chordMidiNums[0];
+  chordIntervals[1] = chordMidiNums[2] - chordMidiNums[1];
   if (chordMidiNums.length == 4) {
-    chordCode[2] = chordMidiNums[3] - chordMidiNums[2];
+    chordIntervals[2] = chordMidiNums[3] - chordMidiNums[2];
   };
-  console.log(chordCode);
-  var chordName = chordCodes[chordCode.join('')]
-  if (chordName == undefined) {
-    chordName = [chordCode.join(''), 0]
+  // get exception name from chordCodes table
+  var chordException = chordCodes[chordIntervals.join('')]
+  if (chordException != undefined) {
+    chordName = chordException
   }
   return chordName
 };
+
+function getChordInversion(chordScaleDegs, orderChordDegs, suspended){
+  console.log('suspended = ' + suspended);
+  console.log('chordScaleDegs= ' + chordScaleDegs);
+  console.log('orderChordDegs= ' + orderChordDegs);
+  // suspended chords dont have inversions. they invert to other suspended chords.
+  if (suspended > 0) {
+    return chordInversion = '-'
+  }
+  // position in ordered scale degs shows inversion
+  var invCalc = chordScaleDegs.length - _.indexOf(orderChordDegs, chordScaleDegs[0]);
+  // Triads inversion calculation
+  if (chordScaleDegs.length == 3) {
+    switch(invCalc) {
+      case 1:
+          return '1st'
+          break;
+      case 2:
+          return '2nd'
+          break;
+      default:
+          return 'Root'
+    }
+  }
+  // Tetrads inversion calculation
+  if (chordScaleDegs.length == 4) {
+    switch(invCalc) {
+      case 1:
+          return '1st'
+          break;
+      case 2:
+          return '2nd'
+          break;
+      case 3:
+          return '3rd'
+          break;
+      default:
+          return 'Root'
+    }
+  }
+  return chordInversion
+};
+
+function getChordIntervals() {
+  var chordIntervalNames = _.map(chordIntervals, function(num){ return intervals[num]; });
+  return chordIntervalNames.join(' ')
+}
+
 
 // returns current chord note letters without octave number
 function ChordNoteLet(){
@@ -309,5 +420,7 @@ module.exports = {
   midiNotesList: midiNotesList,
   chordScaleDegs: chordScaleDegs,
   getChordName: getChordName,
-  getOrderChordDegs: getOrderChordDegs
+  getOrderChordDegs: getOrderChordDegs,
+  getChordInversion: getChordInversion,
+  getChordIntervals: getChordIntervals
 }
