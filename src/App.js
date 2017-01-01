@@ -68,6 +68,12 @@ var App = React.createClass({
 
   setChordVar: function(pad) {
     var chordVariations = pad;
+    // dis-allow sus2 Add 9 Combinations
+    if (this.state.tetrad == 2 && chordVariations == 1) {
+      this.setState({
+        tetrad: 0,
+      })
+    }
     this.setState({
       chordVariations: chordVariations,
     })
@@ -75,6 +81,12 @@ var App = React.createClass({
 
   setTetrad: function(pad) {
     var tetrad = pad;
+    // dis-allow sus2 Add 9 Combinations
+    if (this.state.chordVariations == 1 && tetrad == 2) {
+      this.setState({
+        chordVariations: 0,
+      })
+    }
     this.setState({
       tetrad: tetrad,
     })
