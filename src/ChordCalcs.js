@@ -35,6 +35,39 @@ const allModes = {
       "51" : "Sus4",
       "56" : "Stacked 4ths",
       "61" : "Sus4",
+      // 7th sus2 tetrads
+      "254" : "Sus?",
+      "541" : "Sus?",
+      "412" : "Sus?",
+      "125" : "Sus?",
+      "225" : "Sus?",
+      "253" : "Sus?",
+      "532" : "Sus?",
+      "322" : "Sus?",
+      "216" : "Sus?",
+      "163" : "Sus?",
+      "632" : "Sus?",
+      "542" : "Sus?",
+      "421" : "Sus?",
+      "215" : "Sus?",
+      "154" : "Sus?",
+      // sus4 tetrads
+      "524" : "Sus4?",
+      "241" : "Sus4?",
+      "415" : "Sus4?",
+      "152" : "Sus4?",
+      "252" : "Sus4?",
+      "523" : "Sus4?",
+      "232" : "Sus4?",
+      "325" : "Sus4?",
+      "416" : "Sus4?",
+      "161" : "Sus4?",
+      "614" : "Sus4?",
+      "141" : "Sus4?",
+      "142" : "Sus4?",
+      "425" : "Sus4?",
+      "251" : "Sus4?",
+      "514" : "Sus4?",
       // 7th chords
       "433": "Dom.",
       "332": "Dom.",
@@ -306,6 +339,7 @@ function getChordType(chordMidiNums, btnNum, scale) {
   if (chordMidiNums.length == 4) {
     chordIntervals[2] = chordMidiNums[3] - chordMidiNums[2];
   };
+  console.log(chordIntervals);
   // get exception name from chordCodes table
   var chordException = chordCodes[chordIntervals.join('')]
   if (chordException != undefined) {
