@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "build": "NODE_ENV=production webpack --config ./webpack.config.js --progress --colors",
-    "start": "node ./src/app.js"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
