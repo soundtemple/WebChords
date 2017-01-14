@@ -6,6 +6,7 @@ import cc from "./ChordCalcs.js";
 import webSynth from "./Synth.js";
 import "./App.css";
 
+
 var App = React.createClass({
 
   getInitialState: function() {
