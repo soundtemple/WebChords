@@ -14,7 +14,8 @@ var inputList = [],
     output,
     lightFback,
     chordToPlay = [],
-    controllerMsgData
+    controllerMsgData,
+    controllerMsg
 
 function getInputList() {
   return inputList
@@ -83,7 +84,7 @@ WebMidi.enable(function (err) {
     function (e) {
       e.note.octave += 2;
       var noteOn = e.note.name + e.note.octave;
-      var controllerMsg = controllerMsgData[noteOn]
+      controllerMsg = controllerMsgData[noteOn]
       if (!controllerMsg) {
         controllerMsg = ['Unused']
       }
@@ -109,18 +110,27 @@ WebMidi.enable(function (err) {
   // listen for note off messages
   input.addListener('noteoff', "all",
     function (e) {
-      e.note.octave += 2;
-      var noteOff = e.note.name + e.note.octave;
-      output.stopNote(chordToPlay, 2);
-      // output.stopNote(noteOff, 2);
-      // output.playNote(noteOff, 2, {velocity: 0} );
-      lightFback.playNote(noteOff, 1, {velocity: 0})
+      switch(controllerMsg[0]) {
+        case 'Chord':
+            e.note.octave += 2;
+            var noteOff = e.note.name + e.note.octave;
+            console.log('chord off!!');
+            output.stopNote(chordToPlay, 2);
+            lightFback.playNote(noteOff, 1, {velocity: 0})
+            break;
+        case 'Note':
+            console.log('Run NotePlay Function');
+            break;
+        default:
+            break
+      }
     }
   );
 
 });
 
-
+// output.stopNote(noteOff, 2);
+// output.playNote(noteOff, 2, {velocity: 0} );
 // var chordToPlay = ['C3', 'E3', 'G3']
 // 0.1 =yellow; 0.2=purple; 0.4=light green; light-blue; 0.9 bright green; 0.56=white
 //  push messsages 36-99
