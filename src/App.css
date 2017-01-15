@@ -15,7 +15,7 @@ body {
   flex-direction: column;
   width: 100vw;
   min-width: 360px;
-  max-width: 960px;
+  max-width: 930px;
   height: 95vh;
   min-height: 500px;
   border: 1px solid grey;

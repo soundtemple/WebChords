@@ -78,7 +78,6 @@ WebMidi.enable(function (err) {
       e.note.octave += 2;
       var noteOn = e.note.name + e.note.octave;
       console.log(noteOn);
-      // output.playNote(chordToPlay, 2);
       output.playNote(noteOn, 2, {velocity: .5} );
       lightFback.playNote(noteOn, 1, {velocity: .2} )
     }
@@ -90,7 +89,7 @@ WebMidi.enable(function (err) {
       e.note.octave += 2;
       var noteOff = e.note.name + e.note.octave;
       output.stopNote(noteOff, 2);
-      output.playNote(noteOff, 2, {velocity: 0} );
+      // output.playNote(noteOff, 2, {velocity: 0} );
       lightFback.playNote(noteOff, 1, {velocity: 0})
     }
   );
