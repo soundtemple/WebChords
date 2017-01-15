@@ -1,6 +1,7 @@
 import WebMidi from "webmidi";
 import cc from "./ChordCalcs.js";
 import $ from "jquery";
+import cMData from "./controllerLayout.js"
 
 
 
@@ -8,9 +9,13 @@ var inputList = [],
     outputList = [],
     inputDevice = "Ableton Push User Port",
     outputDevice = "Circuit",
+    mappingID = "abletonPush1",
     input,
     output,
-    lightFback
+    lightFback,
+    chordToPlay = [],
+    controllerMsgData,
+    controllerMsg
 
 function getInputList() {
   return inputList
@@ -30,7 +35,9 @@ function setMidiOut(MidiOutputSelected) {
   console.log('MIDI OUTPUT= ' + outputDevice);
 };
 
-
+function getDeviceMapping(mappingID){
+  controllerMsgData = cMData.getMapping(mappingID);
+}
 
 WebMidi.enable(function (err) {
 
@@ -58,9 +65,9 @@ WebMidi.enable(function (err) {
   });
 
   var input = WebMidi.getInputByName(inputDevice);
+  getDeviceMapping(mappingID)
   var lightFback = WebMidi.getOutputByName(inputDevice);
   var output = WebMidi.getOutputByName(outputDevice);
-
 
 
   // listen for change in I/O select and update WebMidi - NOT WORKING ????
@@ -77,20 +84,46 @@ WebMidi.enable(function (err) {
     function (e) {
       e.note.octave += 2;
       var noteOn = e.note.name + e.note.octave;
-      console.log(noteOn);
-      output.playNote(noteOn, 2, {velocity: .5} );
-      lightFback.playNote(noteOn, 1, {velocity: .2} )
+      controllerMsg = controllerMsgData[noteOn]
+      if (!controllerMsg) {
+        controllerMsg = ['Unused']
+      }
+      switch(controllerMsg[0]) {
+        case 'Chord':
+            console.log('Run ChordPlay Function. Pad' + controllerMsg[1]);
+            chordToPlay = cc.getMidiChord(controllerMsg[1])
+            console.log(chordToPlay);
+            output.playNote(chordToPlay, 2, {velocity: .5} );
+            lightFback.playNote(noteOn, 1, {velocity: .2} )
+            break;
+        case 'Note':
+            console.log('Run NotePlay Function');
+            break;
+        default:
+            break
+      }
+
     }
   );
 
   // listen for note off messages
   input.addListener('noteoff', "all",
     function (e) {
-      e.note.octave += 2;
-      var noteOff = e.note.name + e.note.octave;
-      output.stopNote(noteOff, 2);
-      // output.playNote(noteOff, 2, {velocity: 0} );
-      lightFback.playNote(noteOff, 1, {velocity: 0})
+      switch(controllerMsg[0]) {
+        case 'Chord':
+            output.stopNote(chordToPlay, 2);
+            lightFback.playNote(noteOff, 1, {velocity: 0})
+            break;
+        case 'Note':
+            console.log('Run NotePlay Function');
+            // e.note.octave += 2;
+            // var noteOff = e.note.name + e.note.octave;
+            // output.stopNote(noteOff, 2);
+            // output.playNote(noteOff, 2, {velocity: 0} );
+            break;
+        default:
+            break
+
     }
   );
 

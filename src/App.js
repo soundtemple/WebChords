@@ -71,6 +71,8 @@ var App = React.createClass({
         tetrad: 0,
       })
     }
+    cc.expChordVariation(chordVariations);
+    cc.expTetrad(this.state.tetrad);
     this.setState({
       chordVariations: chordVariations,
     })
@@ -84,6 +86,8 @@ var App = React.createClass({
         chordVariations: 0,
       })
     }
+    cc.expTetrad(tetrad);
+    cc.expChordVariation(this.state.chordVariations);
     this.setState({
       tetrad: tetrad,
     })
