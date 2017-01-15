@@ -14,8 +14,7 @@ var inputList = [],
     output,
     lightFback,
     chordToPlay = [],
-    controllerMsgData,
-    controllerMsg
+    controllerMsgData
 
 function getInputList() {
   return inputList
@@ -84,7 +83,7 @@ WebMidi.enable(function (err) {
     function (e) {
       e.note.octave += 2;
       var noteOn = e.note.name + e.note.octave;
-      controllerMsg = controllerMsgData[noteOn]
+      var controllerMsg = controllerMsgData[noteOn]
       if (!controllerMsg) {
         controllerMsg = ['Unused']
       }
@@ -103,27 +102,19 @@ WebMidi.enable(function (err) {
             break
       }
 
+
     }
   );
 
   // listen for note off messages
   input.addListener('noteoff', "all",
     function (e) {
-      switch(controllerMsg[0]) {
-        case 'Chord':
-            output.stopNote(chordToPlay, 2);
-            lightFback.playNote(noteOff, 1, {velocity: 0})
-            break;
-        case 'Note':
-            console.log('Run NotePlay Function');
-            // e.note.octave += 2;
-            // var noteOff = e.note.name + e.note.octave;
-            // output.stopNote(noteOff, 2);
-            // output.playNote(noteOff, 2, {velocity: 0} );
-            break;
-        default:
-            break
-
+      e.note.octave += 2;
+      var noteOff = e.note.name + e.note.octave;
+      output.stopNote(chordToPlay, 2);
+      // output.stopNote(noteOff, 2);
+      // output.playNote(noteOff, 2, {velocity: 0} );
+      lightFback.playNote(noteOff, 1, {velocity: 0})
     }
   );
 
