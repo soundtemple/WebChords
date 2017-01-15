@@ -10,6 +10,7 @@ const allModes = {
                 "notation" : ['i','iio','III','iv','v','VI','VII','i']
               }
     },
+    oneOctave = 12,
     intervals = {
       "0" : "Unison",
       "1" : "m2",
@@ -75,14 +76,11 @@ const allModes = {
       "243": "Dom.",
       // add 9 chords
       "205": "Major",
-
-    },
-    oneOctave = 12
+    }
 
 
 
-var scale = "major",
-    midiNotesList = {},
+var midiNotesList = {},
     scalePattern = [0,2,4,5,7,9,11,12],
     chordScaleDegs = [],
     chordMidiNums = [],
@@ -121,9 +119,14 @@ function getAllNotes() {
 
 getAllNotes();
 
+
 function getAllModes() {
   return allModes
-}
+};
+
+function getRootNote() {
+  return rootNote
+};
 
 function setKey(newKey) {
   rootNote = parseInt(newKey);
@@ -177,6 +180,7 @@ function setScale(selectedScale) {
   scalePattern = selectedMode.pattern;
   return selectedMode
 }
+
 
 function getChordScaleDegs(btnNum, chordVariations, chordEmb) {
   var chordRoot = btnNum%8;
@@ -421,5 +425,6 @@ module.exports = {
   getChordName: getChordName,
   getOrderChordDegs: getOrderChordDegs,
   getChordInversion: getChordInversion,
-  getChordIntervals: getChordIntervals
+  getChordIntervals: getChordIntervals,
+  getRootNote: getRootNote
 }

@@ -3,7 +3,7 @@ var rootNote = 60,
     oscType = 'sawtooth',
     freqCutoff = 10000,
     filterQ = 5,
-    vca = 5,
+    vca = 2,
     oscillators = [],
     notes = [],
     context = new AudioContext();
@@ -28,7 +28,7 @@ function chordPlayOn(chordFreqNotes, tetrad) {
   // set filter
   biquadFilter.type = "lowpass";
   biquadFilter.frequency.value = 450;
-  biquadFilter.gain.value = 25;
+  biquadFilter.gain.value = 0;
   // biquadFilter.frequency.value = freqCutoff;
   // biquadFilter.Q.value = filterQ;
 

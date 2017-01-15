@@ -17,30 +17,27 @@ var App = React.createClass({
       tetradLabels: ['TRIAD', '7TH', 'ADD9',''],
       settingsButtons: ['#/b','','','','','','','','SHIFT','','','','','','',''],
       allModes: cc.getAllModes(),
-      root: 48,
-      scale: "major",
-      chordVariations: 0,
-      tetrad: 0,
-      selectedMode: cc.setScale("major"),
-      scaleNotes: [],
-      scaleSynthData: [],
-      chordRoot: null,
-      chordRow: null,
-      chordOctAdj: null,
-      chordScaleDegs: [],
-      midiNotesList: [],
-      chordMidiNums: [],
-      chordNoteLetters: [],
-      chordFreqs: [],
-      chordFreqInt: [],
-      orderChordDegs: [],
-      chordName: null,
-      octToggle: false,
-      pentToggle: false,
-      sharpFlatToggle: false,
-      shiftToggle: false,
-      midiInputList: ['Hit Connect IN'],
-      midiOutputList: ['Hit Connect OUT']
+      root: cc.getRootNote(), //sets C2 as base midi note for allNotes key select.
+      scale: "major", // allModes Object.key name for major. needed for chordName calc
+      chordVariations: 0, // send this state to chord calcs
+      tetrad: 0, // send this state to chord calcs
+      selectedMode: cc.setScale("major"), //sets initial scale to major
+      scaleNotes: [],  //to store results from gettter
+      scaleSynthData: [], //to store results from gettter
+      chordScaleDegs: [], //to store results from gettter
+      midiNotesList: [], //to store results from gettter
+      chordMidiNums: [], //to store results from gettter
+      chordNoteLetters: [], //to store results from gettter
+      chordFreqs: [], //to store results from gettter
+      chordFreqInt: [], //to store results from gettter
+      orderChordDegs: [], //to store results from gettter
+      chordName: null,  //to store results from gettter
+      octToggle: false,  // send this state to chord calcs
+      pentToggle: false, // send this state to chord calcs
+      sharpFlatToggle: false,  // send this state to chord calcs
+      shiftToggle: false,  // send this state to chord calcs
+      midiInputList: ['Set MIDI IN'],  // just data at present
+      midiOutputList: ['Set MIDI OUT'] // just data at present
     }
   },
 
@@ -95,7 +92,6 @@ var App = React.createClass({
   scalePlay: function(padID) {
     switch (padID) {
     case 8:
-        console.log('Toggle Pentatonic= ' + this.state.pentToggle );
         this.state.pentToggle = !this.state.pentToggle;
         var pent = this.state.pentToggle;
         this.setState({
@@ -189,22 +185,28 @@ var App = React.createClass({
     }
   },
 
-  refreshMidi: function() {
-    console.log("button clicked calling function");
-    var midiInputList = MidiIO.getMidiInputList();
-    var midiOutputList =  MidiIO.getMidiOutputList();
+
+  getMidiIn: function() {
+    var midiInputList = MidiIO.getInputList();
     this.setState({
-      midiInputList: midiInputList,
+      midiInputList: midiInputList
+    })
+  },
+
+  getMidiOut: function() {
+    var midiOutputList = MidiIO.getOutputList();
+    this.setState({
       midiOutputList: midiOutputList
     })
   },
 
-  setMidiIn: function() {
-    MidiIO.connectMidiInput('Ableton Push User Port');
+  setMidiIn: function(event) {
+    MidiIO.setMidiIn(event.target.value)
+
   },
 
-  setMidiOut: function() {
-    MidiIO.connectMidiOutput('Circuit');
+  setMidiOut: function(event) {
+    MidiIO.setMidiOut(event.target.value)
   },
 
   render: function() {
@@ -218,7 +220,7 @@ var App = React.createClass({
             <div><p>NOTES:</p></div>
             <div><p>DEGS:</p></div>
             <div><p>MIDI#:</p></div>
-            <div><p>FREQ'S:</p></div>
+            <div><p>FREQS:</p></div>
           </div>
           <div className="disp-chord-data">
             <div><p>{this.state.chordName}</p></div>
@@ -261,21 +263,21 @@ var App = React.createClass({
 
           </div>
           <div className="settings-data">
-            <select onClick={this.setMidiIn}>
+            <select onClick={this.getMidiIn} onChange={this.setMidiIn}>
               {this.state.midiInputList.map(function(elem, index) {
                 return (
                     <option key={index} value={elem}>{elem}</option>
                 )
               })}
             </select>
-            <select onClick={this.setMidiOut}>
+            <select onClick={this.getMidiOut} onChange={this.setMidiOut}>
               {this.state.midiOutputList.map(function(elem, index) {
                 return (
                     <option key={index} value={elem}>{elem}</option>
                 )
               })}
             </select>
-            <button onClick={this.refreshMidi}>Refresh Midi</button>
+
           </div>
 
         </div>
