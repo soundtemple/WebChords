@@ -37,7 +37,9 @@ var App = React.createClass({
       sharpFlatToggle: false,  // send this state to chord calcs
       shiftToggle: false,  // send this state to chord calcs
       midiInputList: ['Set MIDI IN'],  // just data at present
-      midiOutputList: ['Set MIDI OUT'] // just data at present
+      midiOutputList: ['Set MIDI OUT'], // just data at present
+      padPlay: -1, //for adding Selected Class to chordPad for button light CSS
+      scalePlay: -1 //for adding Selected Class to scalePad for button light CSS
     }
   },
 
@@ -106,6 +108,7 @@ var App = React.createClass({
         });
         break;
     default:
+        var scalePlay = padID
         var noteToPlay = this.state.scaleSynthData[padID];
         var midiNotesList = cc.getAllNotes();
         var checkSharps = 0;
@@ -121,16 +124,25 @@ var App = React.createClass({
         });
 
     }
+    this.setState({
+      scalePlay: scalePlay,
+    })
   },
 
   scalePlayOff: function() {
+    var scalePlay = -1;
     webSynth.notePlayOff();
+    this.setState({
+      scalePlay: scalePlay,
+    })
   },
 
 
   padOn: function(btnNum) {
     console.log("PAD ON IS TRIGGERED");
     btnNum = btnNum["elem"];
+    var padPlay = btnNum;
+    console.log(btnNum);
     var chordScaleDegs = cc.getChordScaleDegs(btnNum, this.state.chordVariations, this.state.tetrad);
     var chordMidiNums = cc.getChordMidiNums(btnNum, chordScaleDegs);
     var chordNoteLetters = cc.getChordNoteLetters(chordMidiNums, this.state.sharpFlatToggle);
@@ -151,6 +163,7 @@ var App = React.createClass({
       orderChordDegs: orderChordDegs,
       chordInversion: chordInversion,
       chordIntervals: chordIntervals,
+      padPlay: padPlay,
     });
     webSynth.chordPlayOn(chordFreqs, this.state.tetrad);
   },
@@ -158,6 +171,10 @@ var App = React.createClass({
 
 
   padOff: function(btnNum) {
+    var padPlay = -1;
+    this.setState({
+      padPlay: padPlay,
+    });
     webSynth.chordPlayOff(webSynth.oscillators);
   },
 
@@ -320,6 +337,9 @@ var App = React.createClass({
             if (this.state.pentToggle && index == 8) {
               classNameList+= " selected";
             };
+            if (this.state.scalePlay == elem) {
+              classNameList += " selected";
+            }
             return (
               <div className={classNameList} key={elem} id={"scale" + elem} onMouseDown={() => {this.scalePlay(elem)}} onMouseUp={() => {this.scalePlayOff(elem)}} >{this.state.scaleSynthData[index]}
               </div>
@@ -334,7 +354,7 @@ var App = React.createClass({
               classNameList += " selected";
             }
             return (
-              <div className={classNameList} key={elem} id={"var" + elem} onClick={() => {this.setChordVar(elem)}}>{this.state.chordVarLabels[index]}
+              <div className={classNameList} key={elem} id={"var" + elem} onMouseDown={() => {this.setChordVar(elem)}}>{this.state.chordVarLabels[index]}
               </div>
             );
           }, this)}
@@ -344,7 +364,7 @@ var App = React.createClass({
               classNameList += " selected";
             }
             return (
-              <div className={classNameList} key={elem} id={"emb" + elem} onClick={() => {this.setTetrad(elem)}}>{this.state.tetradLabels[index]}
+              <div className={classNameList} key={elem} id={"emb" + elem} onMouseDown={() => {this.setTetrad(elem)}}>{this.state.tetradLabels[index]}
               </div>
             );
           }, this)}
@@ -353,8 +373,12 @@ var App = React.createClass({
 
         <div className="chord-matrix-box">
           {_.range(32).map(function(elem, index) {
+            var classNameList = "button chord-matrix-button"
+            if (this.state.padPlay == elem) {
+              classNameList += " selected";
+            }
             return (
-              <div className="button chord-matrix-button" key={elem} id={"pad" + elem} onMouseDown={() => {this.padOn({elem})}} onMouseUp={() => {this.padOff({elem})}} onClick={() => {this.padOn({elem})}} >
+              <div className={classNameList} key={elem} id={"pad" + elem} onMouseDown={() => {this.padOn({elem})}} onMouseUp={() => {this.padOff({elem})}}  >
               </div>
             );
           }, this)}

@@ -86,64 +86,31 @@ WebMidi.enable(function (err) {
       e.note.octave += 2;
       var noteOn = e.note.name + e.note.octave;
       controllerMsg = controllerMsgData[noteOn]
-      if (!controllerMsg) {
-        controllerMsg = ['Unused']
+      if (controllerMsg) {
+        console.log('chord ON!!' + controllerMsg[0] + controllerMsg[1]);
+        // $( '#' + controllerMsg[0] + controllerMsg[1] ).addClass( "selected" );
+        var clickEvent = document.createEvent('MouseEvents')
+        clickEvent.initEvent('mousedown', true, true);
+        document.getElementById(controllerMsg[0]+ controllerMsg[1]).dispatchEvent(clickEvent);
+        lightFback.playNote(noteOn, 1, {velocity: .2})
       }
-      switch(controllerMsg[0]) {
-        case 'Chord':
-            console.log('chord ON!!');
-            // chordToPlay = cc.getMidiChord(controllerMsg[1]);
-            $( "#pad" + controllerMsg[1] ).addClass( "selected" );
-            var clickEvent = document.createEvent('MouseEvents')
-            clickEvent.initEvent('mousedown', true, true);
-            document.getElementById("pad" + controllerMsg[1]).dispatchEvent(clickEvent);
-            // document.getElementById("pad" + controllerMsg[1]).click();
-            // $( "#pad" + controllerMsg[1] ).trigger("mousedown");
-            // output.playNote(chordToPlay, 2, {velocity: .5} );
-            lightFback.playNote(noteOn, 1, {velocity: .2} )
-            break;
-        case 'Scale':
-            console.log('Run NotePlayON Function');
-            $( "#scale" + controllerMsg[1] ).addClass( "selected" );
-            // noteToPlay = cc.getNoteToPlay(controllerMsg[1])
-            noteToPlay = $( "#scale" + controllerMsg[1] ).val();
-            console.log(noteToPlay);
-            output.playNote(noteToPlay, 2, {velocity: 0.5} );
-            break;
-        default:
-            break
-      }
-
-
     }
   );
 
   // listen for note off messages
   input.addListener('noteoff', "all",
     function (e) {
-      switch(controllerMsg[0]) {
-        case 'Chord':
-            e.note.octave += 2;
-            var noteOff = e.note.name + e.note.octave;
-            console.log('chord off!!');
-            // output.stopNote(chordToPlay, 2);
-            $( "#pad" + controllerMsg[1] ).removeClass( "selected" );
-            var clickEvent = document.createEvent('MouseEvents')
-            clickEvent.initEvent('mouseup', true, true);
-            document.getElementById("pad" + controllerMsg[1]).dispatchEvent(clickEvent);
-            lightFback.playNote(noteOff, 1, {velocity: 0})
-            break;
-        case 'Scale':
-            console.log('Run NotePlayOFF Function');
-            $( "#scale" + controllerMsg[1] ).removeClass( "selected" );
-            output.stopNote(noteToPlay, 2);
-            break;
-        default:
-            break
+      if (controllerMsg) {
+        console.log('chord off!!');
+        e.note.octave += 2;
+        var noteOff = e.note.name + e.note.octave;
+        // $( '#' + controllerMsg[0] + controllerMsg[1] ).removeClass( "selected" );
+        var clickEvent = document.createEvent('MouseEvents')
+        clickEvent.initEvent('mouseup', true, true);
+        document.getElementById(controllerMsg[0] + controllerMsg[1]).dispatchEvent(clickEvent);
+        lightFback.playNote(noteOff, 1, {velocity: 0})
       }
-    }
-  );
-
+    });
 });
 
 // output.stopNote(noteOff, 2);
