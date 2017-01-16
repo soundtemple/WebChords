@@ -41,7 +41,7 @@ var App = React.createClass({
       padPlay: -1, //for adding Selected Class to chordPad for button light CSS
       scalePlay: -1, //for adding Selected Class to scalePad for button light CSS
       synthEngine: true, // use internal synth to create sounds. toggle
-      midiOut: true // send midi out to connected port
+      midiOutOn: true // send midi out to connected port
     }
   },
 
@@ -115,7 +115,7 @@ var App = React.createClass({
         var midiNotesList = cc.getAllNotes();
         var checkSharps = 0;
         var synthEngineOn = this.state.synthEngine;
-        var midiOutOn = this.state.midiOut;
+        var midiOutOn = this.state.midiOutOn;
         if(midiOutOn) {
           console.log('sendout midi');
         }
@@ -154,13 +154,13 @@ var App = React.createClass({
 
 
   padOn: function(btnNum) {
-    console.log("PAD ON IS TRIGGERED");
     btnNum = btnNum["elem"];
     var padPlay = btnNum;
-    console.log(btnNum);
     var chordScaleDegs = cc.getChordScaleDegs(btnNum, this.state.chordVariations, this.state.tetrad);
     var chordMidiNums = cc.getChordMidiNums(btnNum, chordScaleDegs);
     var chordNoteLetters = cc.getChordNoteLetters(chordMidiNums, this.state.sharpFlatToggle);
+    MidiIO.setMidiLetters(chordNoteLetters, this.state.midiOutOn)
+    console.log('midiletters' + chordNoteLetters + this.state.midiOutOn);
     var chordFreqs = cc.getChordFreqs(chordMidiNums);
     var chordFreqInt = cc.getChordFreqInt(chordFreqs);
     var orderChordDegs = cc.getOrderChordDegs(chordNoteLetters)
@@ -169,7 +169,6 @@ var App = React.createClass({
     var chordIntervals = cc.getChordIntervals();
     var synthEngineOn = this.state.synthEngine;
     var midiOutOn = this.state.midiOut;
-    console.log(chordInversion);
     this.setState({
       chordScaleDegs: chordScaleDegs,
       chordMidiNums: chordMidiNums,
@@ -237,10 +236,10 @@ var App = React.createClass({
       });
       break;
     case 15:
-      this.state.midiOut = !this.state.midiOut;
-      var midiOut = this.state.midiOut;
+      this.state.midiOutOn = !this.state.midiOutOn;
+      var midiOutOn = this.state.midiOutOn;
       this.setState({
-        midiOut: midiOut
+        midiOutOn: midiOutOn
       });
       break
     default:
@@ -357,7 +356,7 @@ var App = React.createClass({
             if (this.state.synthEngine && elem == 7) {
               classNameList+= " selected";
             };
-            if (this.state.midiOut && elem == 15) {
+            if (this.state.midiOutOn && elem == 15) {
               classNameList+= " selected";
             };
             return (

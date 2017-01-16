@@ -14,7 +14,9 @@ var inputList = [],
     output,
     lightFback,
     controllerMsgData,
-    controllerMsg
+    controllerMsg,
+    notesToPlay,
+    midiOutOn
 
 function getInputList() {
   return inputList
@@ -36,6 +38,12 @@ function setMidiOut(MidiOutputSelected) {
 
 function getDeviceMapping(mappingID){
   controllerMsgData = cMData.getMapping(mappingID);
+}
+
+function setMidiLetters(midiLetters, midiOut) {
+  notesToPlay = midiLetters;
+  midiOutOn = midiOut
+  console.log(notesToPlay, midiOutOn);
 }
 
 WebMidi.enable(function (err) {
@@ -91,6 +99,9 @@ WebMidi.enable(function (err) {
         document.getElementById(controllerMsg[0]+ controllerMsg[1]).dispatchEvent(clickEvent);
         lightFback.playNote(noteOn, 1, {velocity: controllerMsg[2]})
       }
+      if (midiOutOn) {
+        output.playNote(notesToPlay, 2 );
+      }
     }
   );
 
@@ -105,6 +116,9 @@ WebMidi.enable(function (err) {
         clickEvent.initEvent('mouseup', true, true);
         document.getElementById(controllerMsg[0] + controllerMsg[1]).dispatchEvent(clickEvent);
         lightFback.playNote(noteOff, 1, {velocity: controllerMsg[3]})
+      }
+      if (midiOutOn) {
+        output.stopNote(notesToPlay, 2);
       }
     });
 
@@ -130,6 +144,7 @@ module.exports = {
   getInputList: getInputList,
   getOutputList: getOutputList,
   setMidiIn: setMidiIn,
-  setMidiOut: setMidiOut
+  setMidiOut: setMidiOut,
+  setMidiLetters: setMidiLetters
 
 }
