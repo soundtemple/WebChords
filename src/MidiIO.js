@@ -38,13 +38,19 @@ function setMidiOut(MidiOutputSelected) {
 
 function getDeviceMapping(mappingID){
   controllerMsgData = cMData.getMapping(mappingID);
-}
+};
 
 function setMidiLetters(midiLetters, midiOut) {
   notesToPlay = midiLetters;
   midiOutOn = midiOut
-  console.log(notesToPlay, midiOutOn);
-}
+};
+
+function handleClickEvents(eventType) {
+  var clickEvent = document.createEvent('MouseEvents')
+  clickEvent.initEvent(eventType, true, true);
+  console.log('PAD_ID: ' + controllerMsg[0]+ controllerMsg[1]);
+  document.getElementById(controllerMsg[0]+ controllerMsg[1]).dispatchEvent(clickEvent);
+};
 
 WebMidi.enable(function (err) {
 
@@ -85,21 +91,19 @@ WebMidi.enable(function (err) {
     // console.log('new I/O settings: ' + input.name + inputDevice + ' / ' + output.name + outputDevice);
   })
 
-
   // Listen for a 'note on' message on all channels
   input.addListener('noteon', "all",
     function (e) {
       e.note.octave += 2;
       var noteOn = e.note.name + e.note.octave;
       controllerMsg = controllerMsgData[noteOn]
+      console.log('this is the controller msg' + controllerMsg);
       if (controllerMsg) {
         console.log('chord ON!!' + controllerMsg[0] + controllerMsg[1]);
-        var clickEvent = document.createEvent('MouseEvents')
-        clickEvent.initEvent('mousedown', true, true);
-        document.getElementById(controllerMsg[0]+ controllerMsg[1]).dispatchEvent(clickEvent);
+        handleClickEvents('mousedown');
         lightFback.playNote(noteOn, 1, {velocity: controllerMsg[2]})
       }
-      if (midiOutOn) {
+      if (midiOutOn && controllerMsg[4]) {
         output.playNote(notesToPlay, 2 );
       }
     }
@@ -112,9 +116,7 @@ WebMidi.enable(function (err) {
         console.log('chord off!!');
         e.note.octave += 2;
         var noteOff = e.note.name + e.note.octave;
-        var clickEvent = document.createEvent('MouseEvents')
-        clickEvent.initEvent('mouseup', true, true);
-        document.getElementById(controllerMsg[0] + controllerMsg[1]).dispatchEvent(clickEvent);
+        handleClickEvents('mouseup');
         lightFback.playNote(noteOff, 1, {velocity: controllerMsg[3]})
       }
       if (midiOutOn) {
@@ -122,12 +124,24 @@ WebMidi.enable(function (err) {
       }
     });
 
-
-    // Listen to control change message on all channels
+  // Listen to control change message on all channels
   input.addListener('controlchange', "all",
     function (e) {
-      console.log("Received cc message.", e.channel, e.data[1], e.value);
+      controllerMsg = controllerMsgData[e.data[1]]
+      if (controllerMsg) {
+        var padColor = controllerMsg[2];
+        if (e.value == 0) {
+          padColor = controllerMsg[3];
+        }
+        lightFback.sendControlChange(e.data[1], padColor, 1);
+        console.log('sent cc to: ' + e.data[1] + controllerMsg[2], 1 );
+        if (e.value > 0) {
+          handleClickEvents('mousedown');
+        }
+
+      }
     });
+
 
 });
 

@@ -349,7 +349,7 @@ var App = React.createClass({
               classNameList+= " selected";
             };
             return (
-              <div className={classNameList} key={elem} id={"setting" + elem} onClick={() => {this.settings(elem)}}>{this.state.settingsButtons[index]}
+              <div className={classNameList} key={elem} id={"setting" + elem} onMouseDown={() => {this.settings(elem)}}>{this.state.settingsButtons[index]}
               </div>
             );
           }, this)}
