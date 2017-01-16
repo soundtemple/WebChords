@@ -13,10 +13,8 @@ var inputList = [],
     input,
     output,
     lightFback,
-    chordToPlay = [],
     controllerMsgData,
-    controllerMsg,
-    noteToPlay
+    controllerMsg
 
 function getInputList() {
   return inputList
@@ -88,11 +86,10 @@ WebMidi.enable(function (err) {
       controllerMsg = controllerMsgData[noteOn]
       if (controllerMsg) {
         console.log('chord ON!!' + controllerMsg[0] + controllerMsg[1]);
-        // $( '#' + controllerMsg[0] + controllerMsg[1] ).addClass( "selected" );
         var clickEvent = document.createEvent('MouseEvents')
         clickEvent.initEvent('mousedown', true, true);
         document.getElementById(controllerMsg[0]+ controllerMsg[1]).dispatchEvent(clickEvent);
-        lightFback.playNote(noteOn, 1, {velocity: .2})
+        lightFback.playNote(noteOn, 1, {velocity: controllerMsg[2]})
       }
     }
   );
@@ -104,19 +101,29 @@ WebMidi.enable(function (err) {
         console.log('chord off!!');
         e.note.octave += 2;
         var noteOff = e.note.name + e.note.octave;
-        // $( '#' + controllerMsg[0] + controllerMsg[1] ).removeClass( "selected" );
         var clickEvent = document.createEvent('MouseEvents')
         clickEvent.initEvent('mouseup', true, true);
         document.getElementById(controllerMsg[0] + controllerMsg[1]).dispatchEvent(clickEvent);
-        lightFback.playNote(noteOff, 1, {velocity: 0})
+        lightFback.playNote(noteOff, 1, {velocity: controllerMsg[3]})
       }
     });
+
+
+    // Listen to control change message on all channels
+  input.addListener('controlchange', "all",
+    function (e) {
+      console.log("Received cc message.", e.channel, e.data[1], e.value);
+    });
+
 });
 
+// cc value = velocity
+// cc channel = midi channel
+// cc data[1] = cc number
 // output.stopNote(noteOff, 2);
 // output.playNote(noteOff, 2, {velocity: 0} );
 // var chordToPlay = ['C3', 'E3', 'G3']
-// 0.1 =yellow; 0.2=purple; 0.4=light green; light-blue; 0.9 bright green; 0.56=white
+// 0.1 =yellow; 0.2=purple; 0.25= lightblue 0.4=light green; .41=lightPink; .45=hotpink; 0.47=orange; 0.48=lighterorange; 0.53=blue;  0.56=white
 //  push messsages 36-99
 
 module.exports = {

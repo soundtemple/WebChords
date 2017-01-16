@@ -15,7 +15,7 @@ var App = React.createClass({
       allNotes: ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'],
       chordVarLabels: ['ROOT', 'SUS2', 'SUS4', ''],
       tetradLabels: ['TRIAD', '7TH', 'ADD9',''],
-      settingsButtons: ['#/b','','','','','','','','SHIFT','','','','','','',''],
+      settingsButtons: ['#/b','','','','','','','SYNTH','SHIFT','','','','','','','MIDI'],
       allModes: cc.getAllModes(),
       root: cc.getRootNote(), //sets C2 as base midi note for allNotes key select.
       scale: "major", // allModes Object.key name for major. needed for chordName calc
@@ -39,7 +39,9 @@ var App = React.createClass({
       midiInputList: ['Set MIDI IN'],  // just data at present
       midiOutputList: ['Set MIDI OUT'], // just data at present
       padPlay: -1, //for adding Selected Class to chordPad for button light CSS
-      scalePlay: -1 //for adding Selected Class to scalePad for button light CSS
+      scalePlay: -1, //for adding Selected Class to scalePad for button light CSS
+      synthEngine: true, // use internal synth to create sounds. toggle
+      midiOut: true // send midi out to connected port
     }
   },
 
@@ -112,6 +114,11 @@ var App = React.createClass({
         var noteToPlay = this.state.scaleSynthData[padID];
         var midiNotesList = cc.getAllNotes();
         var checkSharps = 0;
+        var synthEngineOn = this.state.synthEngine;
+        var midiOutOn = this.state.midiOut;
+        if(midiOutOn) {
+          console.log('sendout midi');
+        }
         if (!this.state.sharpFlatToggle) {
           checkSharps = 1;
         }
@@ -119,10 +126,11 @@ var App = React.createClass({
           var thisNote = midiNotesList[elem][checkSharps];
           if (noteToPlay == thisNote) {
             var freqToPlay = cc.convertMidiToFreq(index);
-            webSynth.notePlayOn(freqToPlay);
+            if(synthEngineOn) {
+              webSynth.notePlayOn(freqToPlay);
+            }
           }
         });
-
     }
     this.setState({
       scalePlay: scalePlay,
@@ -131,7 +139,14 @@ var App = React.createClass({
 
   scalePlayOff: function() {
     var scalePlay = -1;
-    webSynth.notePlayOff();
+    var synthEngineOn = this.state.synthEngine;
+    var midiOutOn = this.state.midiOut;
+    if(midiOutOn) {
+      console.log('sendout midi');
+    }
+    if(synthEngineOn) {
+      webSynth.notePlayOff();
+    }
     this.setState({
       scalePlay: scalePlay,
     })
@@ -152,6 +167,8 @@ var App = React.createClass({
     var chordName = cc.getChordName(btnNum, chordMidiNums, this.state.tetrad, this.state.chordVariations, this.state.scale);
     var chordInversion = cc.getChordInversion(chordScaleDegs, orderChordDegs, this.state.chordVariations);
     var chordIntervals = cc.getChordIntervals();
+    var synthEngineOn = this.state.synthEngine;
+    var midiOutOn = this.state.midiOut;
     console.log(chordInversion);
     this.setState({
       chordScaleDegs: chordScaleDegs,
@@ -165,17 +182,30 @@ var App = React.createClass({
       chordIntervals: chordIntervals,
       padPlay: padPlay,
     });
-    webSynth.chordPlayOn(chordFreqs, this.state.tetrad);
+    if(synthEngineOn) {
+      webSynth.chordPlayOn(chordFreqs, this.state.tetrad);
+    };
+    if(midiOutOn) {
+      console.log('sendout midi');
+    }
+
   },
 
 
 
   padOff: function(btnNum) {
     var padPlay = -1;
+    var synthEngineOn = this.state.synthEngine
+    var midiOutOn = this.state.midiOut
     this.setState({
       padPlay: padPlay,
     });
-    webSynth.chordPlayOff(webSynth.oscillators);
+    if(synthEngineOn) {
+      webSynth.chordPlayOff(webSynth.oscillators);
+    };
+    if(midiOutOn) {
+      console.log('sendout midi');
+    }
   },
 
   settings: function(btnNum) {
@@ -190,14 +220,29 @@ var App = React.createClass({
         scaleSynthData: scaleSynthData
       });
       break;
+    case 7:
+     this.state.synthEngine = !this.state.synthEngine;
+     var synthEngine = this.state.synthEngine;
+     console.log("synthEngine" + synthEngine);
+     this.setState({
+       synthEngine: synthEngine
+     });
+     break
     case 8:
       this.state.shiftToggle = !this.state.shiftToggle;
       var shift = this.state.shiftToggle;
       console.log("shift toggle=" + this.state.shiftToggle);
-        this.setState({
-          shift: shift
-        });
+      this.setState({
+        shift: shift
+      });
       break;
+    case 15:
+      this.state.midiOut = !this.state.midiOut;
+      var midiOut = this.state.midiOut;
+      this.setState({
+        midiOut: midiOut
+      });
+      break
     default:
       console.log("No settings assigned");
     }
@@ -308,6 +353,12 @@ var App = React.createClass({
             };
             if (this.state.shiftToggle && elem == 8) {
               classNameList+= " shifted";
+            };
+            if (this.state.synthEngine && elem == 7) {
+              classNameList+= " selected";
+            };
+            if (this.state.midiOut && elem == 15) {
+              classNameList+= " selected";
             };
             return (
               <div className={classNameList} key={elem} id={"setting" + elem} onClick={() => {this.settings(elem)}}>{this.state.settingsButtons[index]}

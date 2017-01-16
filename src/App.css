@@ -177,7 +177,3 @@ button {
 .shifted {
   background-color: red;
 }
-
-:active {
-  background-color: green;
-}
