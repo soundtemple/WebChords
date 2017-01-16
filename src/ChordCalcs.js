@@ -8,6 +8,38 @@ const allModes = {
     natMin:   { "name" : "Natural Minor",
                 "pattern" : [0,2,3,5,7,8,10,12],
                 "notation" : ['i','iio','III','iv','v','VI','VII','i']
+              },
+    harmin:   { "name" : "Harmonic Minor",
+                "pattern" : [0,2,3,5,7,8,11,12],
+                "notation" : ['i', 'iio', 'III+', 'iv',	'V', 'VI', 'viio', 'i']
+              },
+    melmin:   { "name" : "Melodic Minor",
+                "pattern" : [0,2,3,5,7,9,11,12],
+                "notation" : ['i',	'ii',	'III',	'iv',	'v', 'vio',	'VII', 'i']
+              },
+    dorian:   { "name" : "Dorian",
+                "pattern" : [0,2,3,5,7,9,10,12],
+                "notation" : ['i', 'ii',	'III',	'IV',	'v',	'vio',	'VII','i']
+              },
+    mixolyd:  { "name" : "Mixolydian",
+                "pattern" : [0,2,4,5,7,9,10,12],
+                "notation" : ['I',	'ii',	'iiio',	'IV',	'v',	'vi',	'VII', 'i']
+              },
+    lydian:   { "name" : "Lydian",
+                "pattern" : [0,2,4,6,7,9,11,12],
+                "notation" : ['I',	'II',	'iii',	'ivo',	'V',	'vi',	'vii', 'i']
+              },
+    phrygian: { "name" : "Phrygian",
+                "pattern" : [0,1,3,5,7,8,10,12],
+                "notation" : ['i',	'II',	'III',	'iv',	'vo',	'VI',	'vii', 'i']
+              },
+    locrian:   { "name" : "Locrian",
+                "pattern" : [0,1,3,4,7,8,10,12],
+                "notation" : ['io',	'II',	'iii',	'iv',	'V',	'VI',	'vii', 'i']
+              },
+    hybrid:   { "name" : "Hybrid Minor",
+                "pattern" : [0,2,3,5,7,8,11,12],
+                "notation" : ['i',	'iio', 	'III+',	'iv',	'V',	'VI',	'viio', 'i']
               }
     },
     oneOctave = 12,
@@ -335,6 +367,9 @@ function getChordType(chordMidiNums, btnNum, scale) {
   }
   if (chordRomNum.includes("o")) {
     chordName = 'Dim.'
+  }
+  if (chordRomNum.includes("+")) {
+    chordName = 'Aug.'
   }
   // check for edge cases. based on specfic chord note intervals
   chordIntervals = [];
