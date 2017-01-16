@@ -130,7 +130,8 @@ button :active {
 }
 
 
-.scale-button:active {
+.scale-button:active,
+.scale-button.selected {
   background-color: blue;
 }
 
@@ -151,7 +152,8 @@ button :active {
   height: 22%;
 }
 
-.chord-matrix-button:active {
+.chord-matrix-button:active,
+.chord-matrix-button.selected {
   background-color: green;
 }
 

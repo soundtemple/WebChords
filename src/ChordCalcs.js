@@ -93,9 +93,8 @@ var midiNotesList = {},
     chordNoteLetters = [],
     noteInfo = {},
     chordInversion = 0,
-    chordIntervals = [],
-    chordVariations,
-    tetrad
+    chordIntervals = []
+
 
 
 function getAllNotes() {
@@ -132,14 +131,6 @@ function getRootNote() {
 function setKey(newKey) {
   rootNote = parseInt(newKey);
   return rootNote
-}
-
-function expChordVariation(value) {
-  chordVariations = value
-}
-
-function expTetrad(value) {
-  tetrad = value
 }
 
 
@@ -416,14 +407,6 @@ function ChordNoteLet(){
 };
 
 
-// MIDI CALCULATIONS
-function getMidiChord(btnNum) {
-  var chordScaleDegs = getChordScaleDegs(btnNum, chordVariations, tetrad);
-  var chordMidiNums = getChordMidiNums(btnNum, chordScaleDegs);
-  var sharpFlat = true
-  var chordNoteLetters = getChordNoteLetters(chordMidiNums, sharpFlat);
-  return chordNoteLetters
-}
 
 module.exports = {
   getAllNotes: getAllNotes,
@@ -444,8 +427,5 @@ module.exports = {
   getOrderChordDegs: getOrderChordDegs,
   getChordInversion: getChordInversion,
   getChordIntervals: getChordIntervals,
-  getRootNote: getRootNote,
-  getMidiChord: getMidiChord,
-  expChordVariation: expChordVariation,
-  expTetrad: expTetrad
+  getRootNote: getRootNote
 }

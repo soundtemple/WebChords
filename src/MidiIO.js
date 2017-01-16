@@ -15,7 +15,8 @@ var inputList = [],
     lightFback,
     chordToPlay = [],
     controllerMsgData,
-    controllerMsg
+    controllerMsg,
+    noteToPlay
 
 function getInputList() {
   return inputList
@@ -90,14 +91,24 @@ WebMidi.enable(function (err) {
       }
       switch(controllerMsg[0]) {
         case 'Chord':
-            console.log('Run ChordPlay Function. Pad' + controllerMsg[1]);
-            chordToPlay = cc.getMidiChord(controllerMsg[1])
-            console.log(chordToPlay);
-            output.playNote(chordToPlay, 2, {velocity: .5} );
+            console.log('chord ON!!');
+            // chordToPlay = cc.getMidiChord(controllerMsg[1]);
+            $( "#pad" + controllerMsg[1] ).addClass( "selected" );
+            var clickEvent = document.createEvent('MouseEvents')
+            clickEvent.initEvent('mousedown', true, true);
+            document.getElementById("pad" + controllerMsg[1]).dispatchEvent(clickEvent);
+            // document.getElementById("pad" + controllerMsg[1]).click();
+            // $( "#pad" + controllerMsg[1] ).trigger("mousedown");
+            // output.playNote(chordToPlay, 2, {velocity: .5} );
             lightFback.playNote(noteOn, 1, {velocity: .2} )
             break;
-        case 'Note':
-            console.log('Run NotePlay Function');
+        case 'Scale':
+            console.log('Run NotePlayON Function');
+            $( "#scale" + controllerMsg[1] ).addClass( "selected" );
+            // noteToPlay = cc.getNoteToPlay(controllerMsg[1])
+            noteToPlay = $( "#scale" + controllerMsg[1] ).val();
+            console.log(noteToPlay);
+            output.playNote(noteToPlay, 2, {velocity: 0.5} );
             break;
         default:
             break
@@ -115,11 +126,17 @@ WebMidi.enable(function (err) {
             e.note.octave += 2;
             var noteOff = e.note.name + e.note.octave;
             console.log('chord off!!');
-            output.stopNote(chordToPlay, 2);
+            // output.stopNote(chordToPlay, 2);
+            $( "#pad" + controllerMsg[1] ).removeClass( "selected" );
+            var clickEvent = document.createEvent('MouseEvents')
+            clickEvent.initEvent('mouseup', true, true);
+            document.getElementById("pad" + controllerMsg[1]).dispatchEvent(clickEvent);
             lightFback.playNote(noteOff, 1, {velocity: 0})
             break;
-        case 'Note':
-            console.log('Run NotePlay Function');
+        case 'Scale':
+            console.log('Run NotePlayOFF Function');
+            $( "#scale" + controllerMsg[1] ).removeClass( "selected" );
+            output.stopNote(noteToPlay, 2);
             break;
         default:
             break

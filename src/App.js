@@ -71,8 +71,6 @@ var App = React.createClass({
         tetrad: 0,
       })
     }
-    cc.expChordVariation(chordVariations);
-    cc.expTetrad(this.state.tetrad);
     this.setState({
       chordVariations: chordVariations,
     })
@@ -86,8 +84,6 @@ var App = React.createClass({
         chordVariations: 0,
       })
     }
-    cc.expTetrad(tetrad);
-    cc.expChordVariation(this.state.chordVariations);
     this.setState({
       tetrad: tetrad,
     })
@@ -133,6 +129,7 @@ var App = React.createClass({
 
 
   padOn: function(btnNum) {
+    console.log("PAD ON IS TRIGGERED");
     btnNum = btnNum["elem"];
     var chordScaleDegs = cc.getChordScaleDegs(btnNum, this.state.chordVariations, this.state.tetrad);
     var chordMidiNums = cc.getChordMidiNums(btnNum, chordScaleDegs);
@@ -357,7 +354,7 @@ var App = React.createClass({
         <div className="chord-matrix-box">
           {_.range(32).map(function(elem, index) {
             return (
-              <div className="button chord-matrix-button" key={elem} id={"pad" + elem} onMouseDown={() => {this.padOn({elem})}} onMouseUp={() => {this.padOff({elem})}}>
+              <div className="button chord-matrix-button" key={elem} id={"pad" + elem} onMouseDown={() => {this.padOn({elem})}} onMouseUp={() => {this.padOff({elem})}} onClick={() => {this.padOn({elem})}} >
               </div>
             );
           }, this)}
