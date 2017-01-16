@@ -112,13 +112,11 @@ var App = React.createClass({
     default:
         var scalePlay = padID
         var noteToPlay = this.state.scaleSynthData[padID];
+        MidiIO.setMidiLetters(noteToPlay, this.state.midiOutOn);
         var midiNotesList = cc.getAllNotes();
         var checkSharps = 0;
         var synthEngineOn = this.state.synthEngine;
         var midiOutOn = this.state.midiOutOn;
-        if(midiOutOn) {
-          console.log('sendout midi');
-        }
         if (!this.state.sharpFlatToggle) {
           checkSharps = 1;
         }
@@ -126,6 +124,7 @@ var App = React.createClass({
           var thisNote = midiNotesList[elem][checkSharps];
           if (noteToPlay == thisNote) {
             var freqToPlay = cc.convertMidiToFreq(index);
+
             if(synthEngineOn) {
               webSynth.notePlayOn(freqToPlay);
             }
@@ -141,9 +140,6 @@ var App = React.createClass({
     var scalePlay = -1;
     var synthEngineOn = this.state.synthEngine;
     var midiOutOn = this.state.midiOut;
-    if(midiOutOn) {
-      console.log('sendout midi');
-    }
     if(synthEngineOn) {
       webSynth.notePlayOff();
     }
@@ -159,7 +155,7 @@ var App = React.createClass({
     var chordScaleDegs = cc.getChordScaleDegs(btnNum, this.state.chordVariations, this.state.tetrad);
     var chordMidiNums = cc.getChordMidiNums(btnNum, chordScaleDegs);
     var chordNoteLetters = cc.getChordNoteLetters(chordMidiNums, this.state.sharpFlatToggle);
-    MidiIO.setMidiLetters(chordNoteLetters, this.state.midiOutOn)
+    MidiIO.setMidiLetters(chordNoteLetters, this.state.midiOutOn);
     console.log('midiletters' + chordNoteLetters + this.state.midiOutOn);
     var chordFreqs = cc.getChordFreqs(chordMidiNums);
     var chordFreqInt = cc.getChordFreqInt(chordFreqs);
@@ -184,10 +180,6 @@ var App = React.createClass({
     if(synthEngineOn) {
       webSynth.chordPlayOn(chordFreqs, this.state.tetrad);
     };
-    if(midiOutOn) {
-      console.log('sendout midi');
-    }
-
   },
 
 
@@ -202,9 +194,6 @@ var App = React.createClass({
     if(synthEngineOn) {
       webSynth.chordPlayOff(webSynth.oscillators);
     };
-    if(midiOutOn) {
-      console.log('sendout midi');
-    }
   },
 
   settings: function(btnNum) {
