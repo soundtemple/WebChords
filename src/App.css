@@ -47,7 +47,7 @@ button,
   font-size: 1em;
   font-family: "Courier";
   margin: 2px;
-  padding: 2px;
+  padding: 1px;
 }
 
 button :active {
