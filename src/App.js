@@ -264,29 +264,18 @@ var App = React.createClass({
     return (
       <div className="container">
         <div className="display-box">
-          <div className="disp-chord-labels">
-            <div><p>NAME:</p></div>
-            <div><p>INV:</p></div>
-            <div><p>INT:</p></div>
-            <div><p>NOTES:</p></div>
-            <div><p>DEGS:</p></div>
-            <div><p>MIDI#:</p></div>
-            <div><p>FREQS:</p></div>
-          </div>
+
+
           <div className="disp-chord-data">
-            <div><p>{this.state.chordName}</p></div>
-            <div><p>{this.state.chordInversion}</p></div>
-            <div><p>{this.state.chordIntervals}</p></div>
-            <div><p>{this.state.chordNoteLetters.join(' ')}</p></div>
-            <div><p>{this.state.orderChordDegs.join(' ')}</p></div>
-            <div><p>{this.state.chordMidiNums.join(' ')}</p></div>
-            <div><p>{this.state.chordFreqInt.join(' ')}</p></div>
+            <div><p>CHORD:  {this.state.chordName}</p></div>
+            <div><p>INVER:   {this.state.chordInversion}</p></div>
+            <div><p>INTVL:   {this.state.chordIntervals}</p></div>
+            <div><p>NOTES: {this.state.chordNoteLetters.join(' ')}</p></div>
+            <div><p>DEGS.:  {this.state.orderChordDegs.join(' ')}</p></div>
+            <div><p>MIDI#: {this.state.chordMidiNums.join(' ')}</p></div>
+            <div><p>FREQS: {this.state.chordFreqInt.join(' ')}</p></div>
           </div>
-          <div className="scale-info-labels">
-            <div><p>ROOT:</p></div>
-            <div><p>NAME:</p></div>
-            <div><p>NOTES:</p></div>
-          </div>
+
           <div className="scale-info-data">
             <div>
               <select onChange={this.setKey} >
@@ -307,27 +296,21 @@ var App = React.createClass({
               </select>
             </div>
             <div><p>{this.state.scaleNotes.join(' ')}</p></div>
-          </div>
-          <div className="settings-labels">
-            <div><p>MIDI IN:</p></div>
-            <div><p>MIDI OUT:</p></div>
 
-          </div>
-          <div className="settings-data">
-            <select onClick={this.getMidiIn} onChange={this.setMidiIn}>
+            <p>MIDI IN : <select onClick={this.getMidiIn} onChange={this.setMidiIn}>
               {this.state.midiInputList.map(function(elem, index) {
                 return (
                     <option key={index} value={elem}>{elem}</option>
                 )
               })}
-            </select>
-            <select onClick={this.getMidiOut} onChange={this.setMidiOut}>
+            </select></p>
+            <p>MIDI OUT: <select onClick={this.getMidiOut} onChange={this.setMidiOut}>
               {this.state.midiOutputList.map(function(elem, index) {
                 return (
                     <option key={index} value={elem}>{elem}</option>
                 )
               })}
-            </select>
+            </select></p>
 
           </div>
 
