@@ -7,7 +7,8 @@ import cMData from "./controllerLayout.js"
 
 var inputList = [],
     outputList = [],
-    inputDevice = "Ableton Push User Port",
+    // inputDevice = "Ableton Push User Port",
+    inputDevice = "LPK25",
     outputDevice = "Circuit",
     mappingID = "abletonPush1",
     input,
@@ -18,33 +19,40 @@ var inputList = [],
     notesToPlay,
     midiOutOn
 
+// input list is created on midi connection. Fn rtns list to app component
 function getInputList() {
   return inputList
 };
 
+// input list is created on midi connection. Fn rtns list to app component
 function getOutputList() {
   return outputList
 };
 
+// sets midi in device
 function setMidiIn(MidiInputSelected) {
   inputDevice = MidiInputSelected
-  console.log('MIDI INPUT= ' + inputDevice);
+  console.log('MIDI INPUT changed to: ' + inputDevice);
 };
 
+// sets midi out device
 function setMidiOut(MidiOutputSelected) {
   outputDevice = MidiOutputSelected
   console.log('MIDI OUTPUT= ' + outputDevice);
 };
 
+// gets midi mapping for selected midi input device
 function getDeviceMapping(mappingID){
   controllerMsgData = cMData.getMapping(mappingID);
 };
 
+// adds calculated midi letters from chord calcs and app.js to update notes to send out via midi
 function setMidiLetters(midiLetters, midiOut) {
   notesToPlay = midiLetters;
   midiOutOn = midiOut
 };
 
+// midi messages trigger click events to replicate how app component works in trigger chord and scale calcs.
 function handleClickEvents(eventType) {
   var clickEvent = document.createEvent('MouseEvents')
   clickEvent.initEvent(eventType, true, true);
@@ -52,6 +60,8 @@ function handleClickEvents(eventType) {
   document.getElementById(controllerMsg[0]+ controllerMsg[1]).dispatchEvent(clickEvent);
 };
 
+
+// midi setup and listening call back fn
 WebMidi.enable(function (err) {
 
   // success or failure message
@@ -61,7 +71,6 @@ WebMidi.enable(function (err) {
     console.log("WebMidi enabled!");
     console.log(WebMidi.inputs);
     console.log(WebMidi.outputs);
-    console.log("Web midi time = " + WebMidi.time)
   }
 
   // set midi ins and outs to variables
@@ -77,10 +86,11 @@ WebMidi.enable(function (err) {
     outputList[index] = midiOuts[index]["_midiOutput"].name
   });
 
-  var input = WebMidi.getInputByName(inputDevice);
+  input = WebMidi.getInputByName(inputDevice);
+  input = WebMidi.getInputByName(inputDevice);
   getDeviceMapping(mappingID)
-  var lightFback = WebMidi.getOutputByName(inputDevice);
-  var output = WebMidi.getOutputByName(outputDevice);
+  lightFback = WebMidi.getOutputByName(inputDevice);
+  output = WebMidi.getOutputByName(outputDevice);
 
 
   // listen for change in I/O select and update WebMidi - NOT WORKING ????
@@ -88,12 +98,16 @@ WebMidi.enable(function (err) {
     input = WebMidi.getInputByName(inputDevice);
     output = WebMidi.getOutputByName(outputDevice);
     lightFback = WebMidi.getOutputByName(inputDevice);
-    // console.log('new I/O settings: ' + input.name + inputDevice + ' / ' + output.name + outputDevice);
+    console.log('new I/O settings: ' + input.name + inputDevice + ' / ' + output.name + outputDevice);
   })
 
   // Listen for a 'note on' message on all channels
   input.addListener('noteon', "all",
     function (e) {
+      console.log('input===' + input.name + ' vs ' + inputDevice);
+      if (input.name !== inputDevice) {
+        return
+      }
       e.note.octave += 2;
       var noteOn = e.note.name + e.note.octave;
       controllerMsg = controllerMsgData[noteOn]
@@ -130,7 +144,7 @@ WebMidi.enable(function (err) {
       controllerMsg = controllerMsgData[e.data[1]]
       if (controllerMsg) {
         var padColor = controllerMsg[2];
-        if (e.value == 0) {
+        if (e.value === 0) {
           padColor = controllerMsg[3];
         }
         lightFback.sendControlChange(e.data[1], padColor, 1);

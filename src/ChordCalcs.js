@@ -128,7 +128,7 @@ var midiNotesList = {},
     chordIntervals = []
 
 
-
+// creates array of all midi note numbers and corresponding note letters.
 function getAllNotes() {
   var oct = -2
   for (var note=0; note<=128; note+=12) {
@@ -152,20 +152,23 @@ function getAllNotes() {
 
 getAllNotes();
 
+//returns all scale modes to app component
 function getAllModes() {
   return allModes
 };
 
+// returns currently selected root note MIDI VAL (base 48 - C2) to app component
 function getRootNote() {
   return rootNote
 };
 
+//Updates rootNote midi value
 function setKey(newKey) {
   rootNote = parseInt(newKey);
   return rootNote
 }
 
-
+// returns scale note names for selected Mode in specified # or b
 function getScaleNotes(selectedMode, sharpFlatToggle) {
   scaleNoteLetters = []; //reset array
   var dispSharps = 0;
@@ -179,6 +182,7 @@ function getScaleNotes(selectedMode, sharpFlatToggle) {
   return scaleNoteLetters
 };
 
+//removes octave from scale note
 function octaveStrip(notes){
   scaleNotesStripOctave = [];
   notes.forEach(function(note, index){
@@ -188,6 +192,7 @@ function octaveStrip(notes){
   return scaleNotesStripOctave;
 }
 
+// returns notes played by each scale pad
 function getScaleSynthData(selectedMode, octToggle, sharpFlatToggle) {
   var orderScalePads = [0,3,6,1,4,7,2,5,9,12,15,10,13,16,11,14]
   scaleSynthData = []; // reset array
@@ -208,21 +213,22 @@ function getScaleSynthData(selectedMode, octToggle, sharpFlatToggle) {
   return scaleSynthData
 };
 
+// on change updates selected scale and returns selected mode object to app component
 function setScale(selectedScale) {
   var selectedMode = allModes[selectedScale];
   scalePattern = selectedMode.pattern;
   return selectedMode
 }
 
-
+// calculates which scale degrees will comprise chord
 function getChordScaleDegs(btnNum, chordVariations, chordEmb) {
   var chordRoot = btnNum%8;
   var suspension = 0;
   chordScaleDegs = [];
   // suspended chord adj.
-  if (chordVariations == 1) {
+  if (chordVariations === 1) {
       suspension = -1;
-  } else if (chordVariations == 2) {
+  } else if (chordVariations === 2) {
     suspension = 1;
   }
   chordRoot+= 1;
@@ -230,10 +236,10 @@ function getChordScaleDegs(btnNum, chordVariations, chordEmb) {
   chordScaleDegs[1] = chordRoot + 2 + suspension;
   chordScaleDegs[2] = chordRoot + 4;
   // adj for 7th or Add9 chord
-  if (chordEmb == 1) {
+  if (chordEmb === 1) {
     chordScaleDegs[3] = chordRoot + 6; //6 semitones degrees to add 7th;
   };
-  if (chordEmb == 2) {
+  if (chordEmb === 2) {
     chordScaleDegs[3] = chordRoot + 1; //1 semitone degrees to add 9th or 2nd;
   };
   // adj so scale degrees in same octave.
@@ -247,13 +253,14 @@ function getChordScaleDegs(btnNum, chordVariations, chordEmb) {
   return chordScaleDegs;
 };
 
+// calculates midi numbers for each note in chord
 function getChordMidiNums(btnNum, chordScaleDegs) {
   var chordRow = parseInt(btnNum/8) // row determines inversion
   chordMidiNums = []; // reset array
   chordScaleDegs.forEach(function(item, index){
     chordMidiNums[index] = scalePattern[ chordScaleDegs[index] - 1 ] + rootNote;
     // adj for last column root up one octave.
-    if (btnNum%8 == 7) {
+    if (btnNum%8 === 7) {
       chordMidiNums[index]+= 12;
     }
   });
@@ -280,6 +287,7 @@ function getChordMidiNums(btnNum, chordScaleDegs) {
   return chordMidiNums.sort();
 };
 
+// reorder scale degrees based on inversion
 function getOrderChordDegs(chordNoteLetters) {
   var orderChordDegs = [];
   chordLettersStrip = [];
@@ -287,8 +295,6 @@ function getOrderChordDegs(chordNoteLetters) {
   chordNoteLetters.forEach(function(note, index){
     chordLettersStrip[index] = note.substring(0, note.length - 1);
   })
-  console.log('this is the scale notes= '+scaleNotesStripOctave);
-  console.log('this is the chordNoteLetters= '+chordLettersStrip);
   chordLettersStrip.forEach(function(note, index){
     orderChordDegs[index] = scaleNotesStripOctave.indexOf(chordLettersStrip[index]) + 1;
   });
@@ -296,6 +302,7 @@ function getOrderChordDegs(chordNoteLetters) {
   return orderChordDegs;
 }
 
+// calculates freq's in Hz for each note in chord.
 function getChordFreqs(chordMidiNums) {
   chordFreqs = []; // reset array
   chordMidiNums.forEach(function(item, index){
@@ -304,6 +311,7 @@ function getChordFreqs(chordMidiNums) {
   return chordFreqs;
 };
 
+// round frequencies for easy display
 function getChordFreqInt(chordFreqs) {
   var chordFreqInt = []; //reset array
   chordFreqs.forEach(function(item, index){
@@ -312,10 +320,12 @@ function getChordFreqInt(chordFreqs) {
   return chordFreqInt;
 };
 
+// formula to convert a note from midi to Freq
 function convertMidiToFreq(note) {
   return 440 * Math.pow(2, (note - 69) / 12);
 };
 
+// calc note letters for each note in chord given midi nums
 function getChordNoteLetters(chordMidiNums, sharpFlatToggle) {
   chordNoteLetters = []; //reset array
   var dispSharps = 0;
@@ -329,6 +339,7 @@ function getChordNoteLetters(chordMidiNums, sharpFlatToggle) {
   return chordNoteLetters;
 };
 
+// calculate chord name
 function getChordName(btnNum, chordMidiNums, embel, suspended, scale) {
   console.log("embel=" + embel);
   var tetrad
@@ -354,15 +365,16 @@ function getChordName(btnNum, chordMidiNums, embel, suspended, scale) {
   return chordName
 };
 
+// chord type maj min dim or aug
 function getChordType(chordMidiNums, btnNum, scale) {
   var chordName = '';
   // get chord type based on scale degree and triad code in allModes object
   var chordOnDegree = btnNum%8;
   var chordRomNum = allModes[scale].notation[chordOnDegree];
-  if (chordRomNum == chordRomNum.toLowerCase()) {
+  if (chordRomNum === chordRomNum.toLowerCase()) {
     chordName = 'Minor'
   }
-  if (chordRomNum == chordRomNum.toUpperCase()) {
+  if (chordRomNum === chordRomNum.toUpperCase()) {
     chordName = 'Major'
   }
   if (chordRomNum.includes("o")) {
@@ -376,18 +388,19 @@ function getChordType(chordMidiNums, btnNum, scale) {
   // calc chord intervals
   chordIntervals[0] = chordMidiNums[1] - chordMidiNums[0];
   chordIntervals[1] = chordMidiNums[2] - chordMidiNums[1];
-  if (chordMidiNums.length == 4) {
+  if (chordMidiNums.length === 4) {
     chordIntervals[2] = chordMidiNums[3] - chordMidiNums[2];
   };
   console.log(chordIntervals);
   // get exception name from chordCodes table
   var chordException = chordCodes[chordIntervals.join('')]
-  if (chordException != undefined) {
+  if (chordException !== undefined) {
     chordName = chordException
   }
   return chordName
 };
 
+// get inversion type
 function getChordInversion(chordScaleDegs, orderChordDegs, suspended){
   console.log('suspended = ' + suspended);
   console.log('chordScaleDegs= ' + chordScaleDegs);
@@ -399,7 +412,7 @@ function getChordInversion(chordScaleDegs, orderChordDegs, suspended){
   // position in ordered scale degs shows inversion
   var invCalc = chordScaleDegs.length - _.indexOf(orderChordDegs, chordScaleDegs[0]);
   // Triads inversion calculation
-  if (chordScaleDegs.length == 3) {
+  if (chordScaleDegs.length === 3) {
     switch(invCalc) {
       case 1:
           return '1st'
@@ -412,7 +425,7 @@ function getChordInversion(chordScaleDegs, orderChordDegs, suspended){
     }
   }
   // Tetrads inversion calculation
-  if (chordScaleDegs.length == 4) {
+  if (chordScaleDegs.length === 4) {
     switch(invCalc) {
       case 1:
           return '1st'
@@ -430,6 +443,7 @@ function getChordInversion(chordScaleDegs, orderChordDegs, suspended){
   return chordInversion
 };
 
+// return chord intervals for display
 function getChordIntervals() {
   var chordIntervalNames = _.map(chordIntervals, function(num){ return intervals[num]; });
   return chordIntervalNames.join(' ')

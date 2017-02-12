@@ -22,22 +22,22 @@ var App = React.createClass({
       chordVariations: 0, // send this state to chord calcs
       tetrad: 0, // send this state to chord calcs
       selectedMode: cc.setScale("major"), //sets initial scale to major
-      scaleNotes: [],  //to store results from gettter
-      scaleSynthData: [], //to store results from gettter
-      chordScaleDegs: [], //to store results from gettter
-      midiNotesList: [], //to store results from gettter
-      chordMidiNums: [], //to store results from gettter
-      chordNoteLetters: [], //to store results from gettter
-      chordFreqs: [], //to store results from gettter
-      chordFreqInt: [], //to store results from gettter
-      orderChordDegs: [], //to store results from gettter
-      chordName: null,  //to store results from gettter
-      octToggle: false,  // send this state to chord calcs
-      pentToggle: false, // send this state to chord calcs
-      sharpFlatToggle: false,  // send this state to chord calcs
-      shiftToggle: false,  // send this state to chord calcs
-      midiInputList: ['Set MIDI IN'],  // just data at present
-      midiOutputList: ['Set MIDI OUT'], // just data at present
+      scaleNotes: [],  //scale degrees for selected scale
+      scaleSynthData: [], //apply scale notes to scale pads
+      chordScaleDegs: [], //scale degrees in chord construction 1,3,5
+      midiNotesList: [], //midi nums to note lettes table
+      chordMidiNums: [], //midi nums for each note in chord.
+      chordNoteLetters: [], //note letters for each note in chord
+      chordFreqs: [], //Chord notes converted to Frequencies in Hz for synth engine
+      chordFreqInt: [], //Rounded frequencies for display
+      orderChordDegs: [], //order chord degrees based on inversion
+      chordName: null,  //stores calculated chord name
+      octToggle: false,  // scale pads toggle to add 1 octave
+      pentToggle: false, // scale pad button to highlight pentatonic scale degrees
+      sharpFlatToggle: false,  // display notes as # or b
+      shiftToggle: false,  // SHIFT Button to delete mem chords
+      midiInputList: ['Set MIDI IN'],  // displays available midi inputs
+      midiOutputList: ['Set MIDI OUT'], // displays connected midi outputs
       padPlay: -1, //for adding Selected Class to chordPad for button light CSS
       scalePlay: -1, //for adding Selected Class to scalePad for button light CSS
       synthEngine: true, // use internal synth to create sounds. toggle
@@ -45,6 +45,7 @@ var App = React.createClass({
     }
   },
 
+  //sets root note and updates scale notes and synth data
   setKey: function(event) {
     cc.setKey(event.target.value);
     var scaleNotes = cc.getScaleNotes(this.state.selectedMode, this.state.sharpFlatToggle);
@@ -55,6 +56,7 @@ var App = React.createClass({
     })
   },
 
+  //sets scale type and updates all notes
   setScale: function(event) {
     var selectedMode = cc.setScale(event.target.value);
     var scaleNotes = cc.getScaleNotes(selectedMode, this.state.sharpFlatToggle);
@@ -67,10 +69,11 @@ var App = React.createClass({
     });
   },
 
+  // suspended chord variations sus2 or sus4 or none
   setChordVar: function(pad) {
     var chordVariations = pad;
     // dis-allow sus2 Add 9 Combinations
-    if (this.state.tetrad == 2 && chordVariations == 1) {
+    if (this.state.tetrad === 2 && chordVariations === 1) {
       this.setState({
         tetrad: 0,
       })
@@ -80,10 +83,11 @@ var App = React.createClass({
     })
   },
 
+  // triad, 7th chord or Add9 chord option buttons
   setTetrad: function(pad) {
     var tetrad = pad;
     // dis-allow sus2 Add 9 Combinations
-    if (this.state.chordVariations == 1 && tetrad == 2) {
+    if (this.state.chordVariations === 1 && tetrad === 2) {
       this.setState({
         chordVariations: 0,
       })
@@ -93,6 +97,7 @@ var App = React.createClass({
     })
   },
 
+  // activated by scale pads. calculates note to play - note on
   scalePlay: function(padID) {
     switch (padID) {
     case 8:
@@ -122,7 +127,7 @@ var App = React.createClass({
         }
         Object.keys(midiNotesList).map(function(elem, index) {
           var thisNote = midiNotesList[elem][checkSharps];
-          if (noteToPlay == thisNote) {
+          if (noteToPlay === thisNote) {
             var freqToPlay = cc.convertMidiToFreq(index);
 
             if(synthEngineOn) {
@@ -136,6 +141,7 @@ var App = React.createClass({
     })
   },
 
+  // note off for scale play
   scalePlayOff: function() {
     var scalePlay = -1;
     var synthEngineOn = this.state.synthEngine;
@@ -148,7 +154,7 @@ var App = React.createClass({
     })
   },
 
-
+  // chord play activated by chord buttons
   padOn: function(btnNum) {
     btnNum = btnNum["elem"];
     var padPlay = btnNum;
@@ -183,7 +189,7 @@ var App = React.createClass({
   },
 
 
-
+  // activated on button release. stops chord play
   padOff: function(btnNum) {
     var padPlay = -1;
     var synthEngineOn = this.state.synthEngine
@@ -196,8 +202,10 @@ var App = React.createClass({
     };
   },
 
+  // settings options buttons
   settings: function(btnNum) {
     switch (btnNum) {
+    // display notes as # or b's
     case 0:
       this.state.sharpFlatToggle = !this.state.sharpFlatToggle;
       console.log("sharp flat toggle=" + this.state.sharpFlatToggle);
@@ -208,6 +216,7 @@ var App = React.createClass({
         scaleSynthData: scaleSynthData
       });
       break;
+    // send notes to internal synth engine toggle
     case 7:
      this.state.synthEngine = !this.state.synthEngine;
      var synthEngine = this.state.synthEngine;
@@ -216,6 +225,7 @@ var App = React.createClass({
        synthEngine: synthEngine
      });
      break
+    // shoft toggle to delete memchords
     case 8:
       this.state.shiftToggle = !this.state.shiftToggle;
       var shift = this.state.shiftToggle;
@@ -224,6 +234,7 @@ var App = React.createClass({
         shift: shift
       });
       break;
+    // toggle sending midi out to externally connected device
     case 15:
       this.state.midiOutOn = !this.state.midiOutOn;
       var midiOutOn = this.state.midiOutOn;
@@ -236,7 +247,7 @@ var App = React.createClass({
     }
   },
 
-
+  // retrieve list of connected midi inputs
   getMidiIn: function() {
     var midiInputList = MidiIO.getInputList();
     this.setState({
@@ -244,6 +255,7 @@ var App = React.createClass({
     })
   },
 
+  // retrieve list of connected midi outputs
   getMidiOut: function() {
     var midiOutputList = MidiIO.getOutputList();
     this.setState({
@@ -251,11 +263,13 @@ var App = React.createClass({
     })
   },
 
+  // set midi output to seleted option
   setMidiIn: function(event) {
     MidiIO.setMidiIn(event.target.value)
 
   },
 
+  // set midi output to selected option
   setMidiOut: function(event) {
     MidiIO.setMidiOut(event.target.value)
   },
@@ -263,9 +277,8 @@ var App = React.createClass({
   render: function() {
     return (
       <div className="container">
+
         <div className="display-box">
-
-
           <div className="disp-chord-data">
             <div><p>CHORD:  {this.state.chordName}</p></div>
             <div><p>INVER:   {this.state.chordInversion}</p></div>
@@ -319,16 +332,16 @@ var App = React.createClass({
         <div className="settings-box">
           {_.range(16).map(function(elem, index) {
             var classNameList = "button settings-button"
-            if (this.state.sharpFlatToggle && elem == 0) {
+            if (this.state.sharpFlatToggle && elem === 0) {
               classNameList+= " selected";
             };
-            if (this.state.shiftToggle && elem == 8) {
+            if (this.state.shiftToggle && elem === 8) {
               classNameList+= " shifted";
             };
-            if (this.state.synthEngine && elem == 7) {
+            if (this.state.synthEngine && elem === 7) {
               classNameList+= " selected";
             };
-            if (this.state.midiOutOn && elem == 15) {
+            if (this.state.midiOutOn && elem === 15) {
               classNameList+= " selected";
             };
             return (
@@ -353,13 +366,13 @@ var App = React.createClass({
           {/* scale play buttons*/}
           {_.range(18).map(function(elem, index) {
             var classNameList = "button scale-button";
-            if (this.state.octToggle && index == 17) {
+            if (this.state.octToggle && index === 17) {
               classNameList+= " selected";
             };
-            if (this.state.pentToggle && index == 8) {
+            if (this.state.pentToggle && index === 8) {
               classNameList+= " selected";
             };
-            if (this.state.scalePlay == elem) {
+            if (this.state.scalePlay === elem) {
               classNameList += " selected";
             }
             return (
@@ -372,7 +385,7 @@ var App = React.createClass({
         <div className="chord-options-box">
           {_.range(4).map(function(elem, index) {
             var classNameList = "button chord-options-button"
-            if (this.state.chordVariations == elem) {
+            if (this.state.chordVariations === elem) {
               classNameList += " selected";
             }
             return (
@@ -382,7 +395,7 @@ var App = React.createClass({
           }, this)}
           {_.range(4).map(function(elem, index) {
             var classNameList = "button chord-options-button"
-            if (this.state.tetrad == elem) {
+            if (this.state.tetrad === elem) {
               classNameList += " selected";
             }
             return (
@@ -396,7 +409,7 @@ var App = React.createClass({
         <div className="chord-matrix-box">
           {_.range(32).map(function(elem, index) {
             var classNameList = "button chord-matrix-button"
-            if (this.state.padPlay == elem) {
+            if (this.state.padPlay === elem) {
               classNameList += " selected";
             }
             return (
