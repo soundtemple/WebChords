@@ -7,8 +7,8 @@ import cMData from "./controllerLayout.js"
 
 var inputList = [],
     outputList = [],
-    // inputDevice = "Ableton Push User Port",
-    inputDevice = "LPK25",
+    inputDevice = "Ableton Push User Port",
+    // inputDevice = "LPK25",
     outputDevice = "Circuit",
     mappingID = "abletonPush1",
     input,
